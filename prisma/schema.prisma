@@ -1,0 +1,162 @@
+// Этот файл описывает структуру базы данных
+// Prisma по нему создаст таблицы и сгенерирует код для работы с ними
+
+// Генератор — говорит Prisma создать JavaScript-клиент для работы с БД
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Источник данных — какую БД используем и где она находится
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")  // Берёт URL из файла .env
+}
+
+// ==========================================
+// МОДЕЛЬ CATEGORY (Категория слов)
+// ==========================================
+// Это как таблица в Excel. Каждая строка — одна категория.
+// Например: "Животные", "Еда и напитки", "Спорт"
+model Category {
+  id        Int            @id @default(autoincrement())  // Уникальный номер, увеличивается автоматически
+  name      String         @unique                         // Название категории (уникальное)
+  slug      String         @unique                         // URL-дружественное имя (например "animals")
+  words     WordCategory[]                                 // Связь: какие слова в этой категории
+  gameCategories GameCategory[]                            // Связь: в каких играх используется
+  createdAt DateTime       @default(now())                 // Дата создания (автоматически)
+}
+
+// ==========================================
+// МОДЕЛЬ WORD (Слово)
+// ==========================================
+// Каждая строка — одно слово для угадывания
+model Word {
+  id         Int            @id @default(autoincrement())
+  text       String         @unique                        // Текст слова (уникальный)
+  categories WordCategory[]                                // В каких категориях это слово
+  roundWords RoundWord[]                                   // В каких раундах использовалось
+  createdAt  DateTime       @default(now())
+}
+
+// ==========================================
+// МОДЕЛЬ WordCategory (Связь слово-категория)
+// ==========================================
+// Одно слово может быть в нескольких категориях
+// Одна категория содержит много слов
+// Это называется "связь многие-ко-многим" (Many-to-Many)
+model WordCategory {
+  wordId     Int
+  categoryId Int
+  word       Word     @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([wordId, categoryId])  // Составной первичный ключ
+}
+
+// ==========================================
+// ПЕРЕЧИСЛЕНИЕ GameStatus (Статус игры)
+// ==========================================
+// enum — это тип данных, который может принимать только определённые значения
+enum GameStatus {
+  IN_PROGRESS  // Игра идёт
+  FINISHED     // Игра завершена
+}
+
+// ==========================================
+// МОДЕЛЬ GAME (Игра)
+// ==========================================
+// Главная таблица — хранит информацию об одной игре
+model Game {
+  id                 String       @id @default(cuid())     // Уникальный ID (строка, не число)
+  sessionId          String                                 // ID браузера пользователя
+  status             GameStatus   @default(IN_PROGRESS)    // Статус игры
+  
+  // Настройки игры
+  roundTime          Int          @default(60)             // Время раунда в секундах
+  winScore           Int          @default(50)             // Очки для победы (0 = бесконечно)
+  penaltySkip        Boolean      @default(false)          // Штраф за пропуск слова?
+  
+  // Текущее состояние
+  currentTeamIndex   Int          @default(0)              // Какая команда сейчас ходит (0, 1, 2...)
+  currentRoundNumber Int          @default(1)              // Номер текущего раунда
+  
+  // Связи с другими таблицами
+  teams              Team[]                                 // Команды в этой игре
+  rounds             Round[]                                // Раунды этой игры
+  gameCategories     GameCategory[]                         // Выбранные категории
+  
+  usedWordIds        Int[]        @default([])             // Список ID уже использованных слов
+  
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt               // Обновляется автоматически
+}
+
+// ==========================================
+// МОДЕЛЬ GameCategory (Какие категории выбраны для игры)
+// ==========================================
+model GameCategory {
+  gameId     String
+  categoryId Int
+  game       Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([gameId, categoryId])
+}
+
+// ==========================================
+// МОДЕЛЬ TEAM (Команда)
+// ==========================================
+model Team {
+  id                 Int      @id @default(autoincrement())
+  name               String                                 // Название команды
+  score              Int      @default(0)                   // Текущий счёт
+  order              Int                                     // Порядковый номер (0, 1, 2, 3)
+  currentPlayerIndex Int      @default(0)                   // Кто сейчас объясняет
+  
+  gameId             String                                  // К какой игре относится
+  game               Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  
+  players            Player[]                                // Игроки команды
+  rounds             Round[]                                 // Раунды команды
+}
+
+// ==========================================
+// МОДЕЛЬ PLAYER (Игрок)
+// ==========================================
+model Player {
+  id     Int    @id @default(autoincrement())
+  name   String                                              // Имя игрока
+  order  Int                                                  // Порядковый номер в команде
+  teamId Int                                                  // В какой команде
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+}
+
+// ==========================================
+// МОДЕЛЬ ROUND (Раунд)
+// ==========================================
+// Один ход одной команды — это один раунд
+model Round {
+  id          Int         @id @default(autoincrement())
+  roundNumber Int                                             // Номер раунда
+  teamId      Int                                              // Какая команда играла
+  team        Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  gameId      String                                           // В какой игре
+  game        Game        @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  playerName  String                                           // Кто объяснял
+  scoreEarned Int         @default(0)                          // Очков заработано
+  words       RoundWord[]                                      // Слова этого раунда
+  createdAt   DateTime    @default(now())
+}
+
+// ==========================================
+// МОДЕЛЬ RoundWord (Слово в раунде)
+// ==========================================
+// Каждое слово, которое показывалось в раунде
+model RoundWord {
+  id      Int     @id @default(autoincrement())
+  guessed Boolean                                              // true = угадано, false = пропущено
+  roundId Int
+  round   Round   @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  wordId  Int
+  word    Word    @relation(fields: [wordId], references: [id], onDelete: Cascade)
+}
