@@ -6,12 +6,13 @@
 export const MIN_TEAMS = 2 // Минимум команд
 export const MAX_TEAMS = 4 // Максимум команд
 export const MIN_PLAYERS_PER_TEAM = 2 // Минимум игроков в команде
+export const MAX_PLAYERS_PER_TEAM = 6 // Максимум игроков в команде
 
 // Варианты времени раунда (в секундах)
 export const ROUND_TIME_OPTIONS = [30, 45, 60, 90, 120]
 
-// Варианты очков для победы (0 = бесконечная игра)
-export const WIN_SCORE_OPTIONS = [25, 50, 75, 100, 0]
+// Варианты очков для победы
+export const WIN_SCORE_OPTIONS = [25, 50, 75, 100]
 
 // Сколько слов загружать за раз с сервера
 export const WORDS_BATCH_SIZE = 50

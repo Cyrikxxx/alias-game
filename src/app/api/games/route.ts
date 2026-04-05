@@ -47,6 +47,9 @@ export async function POST(request: NextRequest) {
 		const body = await request.json()
 		const { sessionId, settings, teams } = body
 
+		// Диагностика: проверяем что приходит от клиента
+		console.log('Creating game with settings:', settings)
+
 		// Проверяем что данные корректные
 		if (!sessionId || !settings || !teams || teams.length < 2) {
 			return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })

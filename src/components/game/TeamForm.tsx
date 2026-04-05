@@ -1,6 +1,6 @@
 'use client'
 import { TeamSetup } from '@/types'
-import { MIN_PLAYERS_PER_TEAM, MAX_TEAMS, TEAM_COLORS } from '@/constants'
+import { MIN_PLAYERS_PER_TEAM, MAX_PLAYERS_PER_TEAM, MAX_TEAMS, TEAM_COLORS } from '@/constants'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
@@ -32,6 +32,8 @@ export default function TeamForm({ teams, setTeams, errors }: TeamFormProps) {
 	// Добавление игрока в команду
 	const addPlayer = (teamIndex: number) => {
 		const updated = [...teams]
+		// Проверяем, не достигнут ли максимум игроков
+		if (updated[teamIndex].players.length >= MAX_PLAYERS_PER_TEAM) return
 		updated[teamIndex] = {
 			...updated[teamIndex],
 			players: [...updated[teamIndex].players, { name: '' }],
@@ -123,14 +125,16 @@ export default function TeamForm({ teams, setTeams, errors }: TeamFormProps) {
 							))}
 						</div>
 
-						<Button
-							variant='ghost'
-							size='sm'
-							onClick={() => addPlayer(ti)}
-							className='mt-2'
-						>
-							+ Добавить игрока
-						</Button>
+						{team.players.length < MAX_PLAYERS_PER_TEAM && (
+							<Button
+								variant='ghost'
+								size='sm'
+								onClick={() => addPlayer(ti)}
+								className='mt-2'
+							>
+								+ Добавить игрока
+							</Button>
+						)}
 					</div>
 				)
 			})}

@@ -30,6 +30,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 		const skippedCount = words.filter((w: { guessed: boolean }) => !w.guessed).length
 		const scoreEarned = guessedCount - (game.penaltySkip ? skippedCount : 0)
 
+		// Диагностика: проверяем расчет очков
+		console.log('Round scoring:', {
+			guessedCount,
+			skippedCount,
+			penaltySkip: game.penaltySkip,
+			scoreEarned,
+		})
+
 		const round = await prisma.round.create({
 			data: {
 				roundNumber: game.currentRoundNumber,

@@ -30,6 +30,14 @@ export default function RoundSummary({
 	const skippedCount = answered.filter(w => w.guessed === false).length
 	const score = guessedCount - (penaltySkip ? skippedCount : 0)
 
+	// Диагностика: проверяем расчет очков
+	console.log('RoundSummary scoring:', {
+		guessedCount,
+		skippedCount,
+		penaltySkip,
+		score,
+	})
+
 	return (
 		<Modal
 			isOpen={isOpen}
@@ -58,10 +66,12 @@ export default function RoundSummary({
 					<span>Угадано:</span>
 					<span className='text-success font-bold'>+{guessedCount}</span>
 				</div>
-				{penaltySkip && skippedCount > 0 && (
+				{skippedCount > 0 && (
 					<div className='flex justify-between text-sm text-text-secondary'>
-						<span>Штраф:</span>
-						<span className='text-danger font-bold'>−{skippedCount}</span>
+						<span>Пропущено:</span>
+						<span className={penaltySkip ? 'text-danger font-bold' : 'text-text-secondary'}>
+							{penaltySkip ? `−${skippedCount}` : `${skippedCount} (без штрафа)`}
+						</span>
 					</div>
 				)}
 				<div className='flex justify-between text-lg font-bold text-text-primary mt-2 pt-2 border-t border-surface'>

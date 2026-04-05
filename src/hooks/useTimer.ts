@@ -22,6 +22,12 @@ export function useTimer({ initialTime, onTimeUp, autoStart = false }: UseTimerO
 	const onTimeUpRef = useRef(onTimeUp)
 	onTimeUpRef.current = onTimeUp
 
+	// Обновляем timeLeft когда initialTime меняется (например, когда загрузились данные игры)
+	useEffect(() => {
+		console.log('Timer initialTime updated to:', initialTime)
+		setTimeLeft(initialTime)
+	}, [initialTime])
+
 	// useEffect — выполняет "побочный эффект" (в данном случае — запускает интервал)
 	// Выполняется когда isRunning или timeLeft изменяются
 	useEffect(() => {
