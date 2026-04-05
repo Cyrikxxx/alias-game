@@ -70,6 +70,9 @@ export default function RoundPage() {
 					const gameData = await gameRes.json()
 					const wordsData = await wordsRes.json()
 
+					// Диагностика: проверяем что загружается из БД
+					console.log('Game loaded with roundTime:', gameData.roundTime, 'winScore:', gameData.winScore)
+
 					setGame(gameData)
 					// Преобразуем слова в формат для раунда
 					setWords(

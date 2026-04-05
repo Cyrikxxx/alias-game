@@ -55,6 +55,8 @@ export default function SettingsPage() {
 		const teams: TeamSetup[] = JSON.parse(teamsJson)
 		const sessionId = getSessionId()
 
+		console.log('Starting game with settings:', settings)
+
 		setCreating(true)
 		try {
 			// Отправляем POST-запрос для создания игры
