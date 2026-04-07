@@ -3,33 +3,64 @@ import prisma from '@/lib/prisma'
 
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: Promise<{ id: string }> } // <-- Изменение здесь
+	{ params }: { params: Promise<{ id: string }> }
 ) {
+	const startTime = Date.now()
 	try {
-		const { id } = await params // <-- И здесь мы ждем (await) получения id
+		const { id } = await params
+		const { searchParams } = new URL(request.url)
+		const includeRounds = searchParams.get('includeRounds') === 'true'
+
+		console.log(`[GET /api/games/${id}] includeRounds=${includeRounds}`)
 
 		const game = await prisma.game.findUnique({
 			where: { id },
-			include: {
+			select: {
+				id: true,
+				status: true,
+				roundTime: true,
+				winScore: true,
+				penaltySkip: true,
+				currentTeamIndex: true,
+				currentRoundNumber: true,
 				teams: {
-					include: { players: { orderBy: { order: 'asc' } } },
-					orderBy: { order: 'asc' },
+					select: {
+						id: true,
+						name: true,
+						score: true,
+						order: true,
+						currentPlayerIndex: true,
+						players: {
+							select: { id: true, name: true, order: true },
+							orderBy: { order: 'asc' }
+						}
+					},
+					orderBy: { order: 'asc' }
 				},
-				rounds: {
+				gameCategories: {
+					select: {
+						categoryId: true,
+						category: { select: { id: true, name: true, slug: true } }
+					}
+				},
+				rounds: includeRounds ? {
 					include: { words: { include: { word: true } } },
-					orderBy: { createdAt: 'asc' },
-				},
-				gameCategories: { include: { category: true } },
-			},
+					orderBy: { createdAt: 'asc' }
+				} : false
+			}
 		})
 
 		if (!game) {
 			return NextResponse.json({ error: 'Game not found' }, { status: 404 })
 		}
 
+		const duration = Date.now() - startTime
+		console.log(`[GET /api/games/${id}] completed in ${duration}ms`)
+
 		return NextResponse.json(game)
 	} catch (error) {
-		console.error('GET /api/games/[id] error:', error)
+		const duration = Date.now() - startTime
+		console.error(`[GET /api/games/${id}] error after ${duration}ms:`, error)
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
 	}
 }
