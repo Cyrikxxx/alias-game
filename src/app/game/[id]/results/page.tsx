@@ -19,7 +19,7 @@ export default function ResultsPage() {
 	useEffect(() => {
 		const fetchGame = async () => {
 			try {
-				const res = await fetch(`/api/games/${gameId}`)
+				const res = await fetch(`/api/games/${gameId}?includeRounds=true`)
 				if (res.ok) {
 					setGame(await res.json())
 				}
