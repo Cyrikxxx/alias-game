@@ -4,12 +4,20 @@ import { shuffleArray } from '@/lib/utils'
 import { WORDS_BATCH_SIZE } from '@/constants'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+	const startTime = Date.now()
 	try {
-		const { id } = await params // Достаем id правильно
+		const { id } = await params
 
+		console.log(`[GET /api/games/${id}/words] started`)
+
+		// Оптимизированный запрос: получаем categoryIds и используем подзапрос вместо notIn
 		const game = await prisma.game.findUnique({
 			where: { id },
-			include: { gameCategories: true },
+			select: { 
+				gameCategories: { 
+					select: { categoryId: true } 
+				} 
+			},
 		})
 
 		if (!game) {
@@ -18,21 +26,32 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
 		const categoryIds = game.gameCategories.map(gc => gc.categoryId)
 
+		// Используем NOT EXISTS вместо notIn для лучшей производительности
 		const words = await prisma.word.findMany({
 			where: {
 				categories: {
 					some: { categoryId: { in: categoryIds } },
 				},
-				id: { notIn: game.usedWordIds },
+				NOT: {
+					roundWords: {
+						some: {
+							round: { gameId: id }
+						}
+					}
+				}
 			},
 			select: { id: true, text: true },
 		})
 
 		const shuffled = shuffleArray(words).slice(0, WORDS_BATCH_SIZE)
 
+		const duration = Date.now() - startTime
+		console.log(`[GET /api/games/${id}/words] completed in ${duration}ms, returned ${shuffled.length} words`)
+
 		return NextResponse.json(shuffled)
 	} catch (error) {
-		console.error('GET /api/games/[id]/words error:', error)
+		const duration = Date.now() - startTime
+		console.error(`[GET /api/games/${id}/words] error after ${duration}ms:`, error)
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
 	}
 }

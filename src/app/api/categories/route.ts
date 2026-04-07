@@ -4,6 +4,8 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+export const revalidate = 3600 // Кеширование на 1 час
+
 export async function GET() {
 	try {
 		// Получаем все категории из БД
