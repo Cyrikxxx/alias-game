@@ -24,6 +24,9 @@ model Category {
   words     WordCategory[]                                 // Связь: какие слова в этой категории
   gameCategories GameCategory[]                            // Связь: в каких играх используется
   createdAt DateTime       @default(now())                 // Дата создания (автоматически)
+  
+  @@index([name])  // Ускоряет поиск по названию
+  @@index([slug])  // Ускоряет поиск по slug
 }
 
 // ==========================================
@@ -36,6 +39,8 @@ model Word {
   categories WordCategory[]                                // В каких категориях это слово
   roundWords RoundWord[]                                   // В каких раундах использовалось
   createdAt  DateTime       @default(now())
+  
+  @@index([text])  // Ускоряет поиск по тексту
 }
 
 // ==========================================
@@ -51,6 +56,7 @@ model WordCategory {
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([wordId, categoryId])  // Составной первичный ключ
+  @@index([categoryId])        // Ускоряет фильтрацию по категории
 }
 
 // ==========================================
