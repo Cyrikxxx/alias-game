@@ -7,6 +7,7 @@ interface WordCardProps {
 
 // Карточка со словом — показывается крупно по центру экрана
 export default function WordCard({ word }: WordCardProps) {
+	console.log('WordCard render:', word)
 	return (
 		<div className='flex items-center justify-center flex-1 px-4'>
 			{/* key={word} заставляет React пересоздавать элемент при смене слова,

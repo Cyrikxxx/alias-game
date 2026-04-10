@@ -67,22 +67,15 @@ export default function TurnPage() {
 					<ScoreBoard
 						teams={game.teams}
 						currentTeamIndex={game.currentTeamIndex}
+						showPlayers={true}
+						currentPlayerId={currentPlayer.id}
 						compact
 					/>
 				</div>
 
 				{/* Информация о текущем ходе */}
 				<div className='text-center flex-1 flex flex-col justify-center'>
-					<div className={cn('inline-block px-8 py-6 rounded-2xl mb-4', color.bg, 'border-2', color.border)}>
-						<p className='text-text-secondary text-sm mb-1'>Ход команды</p>
-						<h1 className={cn('text-3xl font-bold', color.text)}>{currentTeam.name}</h1>
-					</div>
-
-					<p className='text-text-primary text-xl mb-2'>
-						Объясняет: <span className='font-bold'>{currentPlayer.name}</span>
-					</p>
-
-					<div className='bg-surface-light/50 rounded-xl px-4 py-3 mt-4 max-w-sm mx-auto'>
+					<div className='bg-surface-light/50 rounded-xl px-4 py-3 max-w-sm mx-auto'>
 						<p className='text-text-secondary text-sm'>
 							📱 Передайте устройство игроку{' '}
 							<span className='text-text-primary font-semibold'>{currentPlayer.name}</span> из команды{' '}
