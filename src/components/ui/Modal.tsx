@@ -27,7 +27,7 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
 		<div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
 			{/* Затемнённый фон — при клике закрываем */}
 			<div
-				className='absolute inset-0 bg-black/60'
+				className='absolute inset-0 bg-black/60 backdrop-blur-sm'
 				onClick={onClose}
 			/>
 			{/* Само окно */}

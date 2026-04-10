@@ -5,18 +5,19 @@ import { WORDS_BATCH_SIZE } from '@/constants'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	const startTime = Date.now()
+	let id: string = ''
 	try {
-		const { id } = await params
+		id = (await params).id
 
 		console.log(`[GET /api/games/${id}/words] started`)
 
 		// Оптимизированный запрос: получаем categoryIds и используем подзапрос вместо notIn
 		const game = await prisma.game.findUnique({
 			where: { id },
-			select: { 
-				gameCategories: { 
-					select: { categoryId: true } 
-				} 
+			select: {
+				gameCategories: {
+					select: { categoryId: true },
+				},
 			},
 		})
 
@@ -35,10 +36,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 				NOT: {
 					roundWords: {
 						some: {
-							round: { gameId: id }
-						}
-					}
-				}
+							round: { gameId: id },
+						},
+					},
+				},
 			},
 			select: { id: true, text: true },
 		})
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 		return NextResponse.json(shuffled)
 	} catch (error) {
 		const duration = Date.now() - startTime
-		console.error(`[GET /api/games/${id}/words] error after ${duration}ms:`, error)
+		console.error(`[GET /api/games/${id || 'unknown'}/words] error after ${duration}ms:`, error)
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
 	}
 }

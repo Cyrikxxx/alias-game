@@ -3,8 +3,9 @@ import prisma from '@/lib/prisma'
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	const startTime = Date.now()
+	let id: string = ''
 	try {
-		const { id } = await params
+		id = (await params).id
 
 		const body = await request.json()
 		const { teamId, playerName, words } = body
@@ -29,101 +30,108 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 			return NextResponse.json({ error: 'Game not found' }, { status: 404 })
 		}
 
-	const guessedCount = words.filter((w: { guessed: boolean }) => w.guessed).length
-	const skippedCount = words.filter((w: { guessed: boolean }) => !w.guessed).length
-	const scoreEarned = guessedCount - (game.penaltySkip ? skippedCount : 0)
+		const guessedCount = words.filter((w: { guessed: boolean }) => w.guessed).length
+		const skippedCount = words.filter((w: { guessed: boolean }) => !w.guessed).length
+		const scoreEarned = guessedCount - (game.penaltySkip ? skippedCount : 0)
 
-	// Диагностика: проверяем расчет очков
-	console.log('Round scoring:', {
-		guessedCount,
-		skippedCount,
-		penaltySkip: game.penaltySkip,
-		scoreEarned,
-	})
+		// Диагностика: проверяем расчет очков
+		console.log('Round scoring:', {
+			guessedCount,
+			skippedCount,
+			penaltySkip: game.penaltySkip,
+			scoreEarned,
+		})
 
-	const team = game.teams.find(t => t.id === teamId)!
-	const newTeamScore = Math.max(0, team.score + scoreEarned)
+		const team = game.teams.find(t => t.id === teamId)!
+		const newTeamScore = Math.max(0, team.score + scoreEarned)
 
-	const numTeams = game.teams.length
-	const nextTeamIndex = (game.currentTeamIndex + 1) % numTeams
-	const nextRoundNumber = nextTeamIndex === 0 ? game.currentRoundNumber + 1 : game.currentRoundNumber
+		const numTeams = game.teams.length
+		const nextTeamIndex = (game.currentTeamIndex + 1) % numTeams
+		const nextRoundNumber = nextTeamIndex === 0 ? game.currentRoundNumber + 1 : game.currentRoundNumber
 
-	const newUsedWordIds = words.map((w: { wordId: number }) => w.wordId)
+		const newUsedWordIds = words.map((w: { wordId: number }) => w.wordId)
 
-	let gameFinished = false
-	let winnerId: number | undefined
+		let gameFinished = false
+		let winnerId: number | undefined
 
-	if (game.winScore > 0) {
-		const updatedTeams = game.teams.map(t => 
-			t.id === teamId 
-				? { ...t, score: newTeamScore }
-				: t
-		)
-
-		const currentTeamUpdated = updatedTeams.find(t => t.id === teamId)!
-		if (currentTeamUpdated.score >= game.winScore) {
+		if (game.winScore > 0) {
+			const updatedTeams = game.teams.map(t => (t.id === teamId ? { ...t, score: newTeamScore } : t))
 			const isEndOfCycle = nextTeamIndex === 0
 
+			console.log('Victory check:', {
+				currentTeamIndex: game.currentTeamIndex,
+				nextTeamIndex,
+				teamScores: updatedTeams.map(t => ({ name: t.name, score: t.score })),
+				winScore: game.winScore,
+				isEndOfCycle,
+			})
+
+			// Проверяем победу только в конце цикла (когда все команды сыграли раунд)
 			if (isEndOfCycle) {
 				const qualifiedTeams = updatedTeams.filter(t => t.score >= game.winScore)
+
 				if (qualifiedTeams.length > 0) {
 					const winner = qualifiedTeams.reduce((best, t) => (t.score > best.score ? t : best))
 					gameFinished = true
 					winnerId = winner.id
+					console.log('Game finished! Winner:', winner.name, 'Score:', winner.score)
+				} else {
+					console.log('End of cycle but no team reached winScore yet')
 				}
+			} else {
+				console.log('Not end of cycle yet, game continues')
 			}
 		}
-	}
 
-	const result = await prisma.$transaction(async (tx) => {
-		// 1. Создать раунд с словами
-		const round = await tx.round.create({
-			data: {
-				roundNumber: game.currentRoundNumber,
-				teamId,
-				gameId: id,
-				playerName,
-				scoreEarned,
-				words: {
-					create: words.map((w: { wordId: number; guessed: boolean }) => ({
-						wordId: w.wordId,
-						guessed: w.guessed,
-					})),
+		const result = await prisma.$transaction(async tx => {
+			// 1. Создать раунд с словами
+			const round = await tx.round.create({
+				data: {
+					roundNumber: game.currentRoundNumber,
+					teamId,
+					gameId: id,
+					playerName,
+					scoreEarned,
+					words: {
+						create: words.map((w: { wordId: number; guessed: boolean }) => ({
+							wordId: w.wordId,
+							guessed: w.guessed,
+						})),
+					},
 				},
-			},
-			select: { id: true, roundNumber: true, scoreEarned: true },
+				select: { id: true, roundNumber: true, scoreEarned: true },
+			})
+
+			// 2. Обновить счет команды
+			await tx.team.update({
+				where: { id: teamId },
+				data: {
+					score: newTeamScore,
+					currentPlayerIndex: (team.currentPlayerIndex + 1) % team.players.length,
+				},
+			})
+
+			// 3. Обновить состояние игры
+			await tx.game.update({
+				where: { id },
+				data: {
+					currentTeamIndex: gameFinished ? game.currentTeamIndex : nextTeamIndex,
+					currentRoundNumber: gameFinished ? game.currentRoundNumber : nextRoundNumber,
+					status: gameFinished ? 'FINISHED' : 'IN_PROGRESS',
+					usedWordIds: { push: newUsedWordIds },
+				},
+			})
+
+			return { round, teamScore: newTeamScore, gameFinished, winnerId, nextTeamIndex, nextRoundNumber }
 		})
 
-		// 2. Обновить счет команды
-		await tx.team.update({
-			where: { id: teamId },
-			data: {
-				score: newTeamScore,
-				currentPlayerIndex: (team.currentPlayerIndex + 1) % team.players.length,
-			},
-		})
+		const duration = Date.now() - startTime
+		console.log(`[POST /api/games/${id}/rounds] completed in ${duration}ms, gameFinished=${gameFinished}`)
 
-		// 3. Обновить состояние игры
-		await tx.game.update({
-			where: { id },
-			data: {
-				currentTeamIndex: gameFinished ? game.currentTeamIndex : nextTeamIndex,
-				currentRoundNumber: gameFinished ? game.currentRoundNumber : nextRoundNumber,
-				status: gameFinished ? 'FINISHED' : 'IN_PROGRESS',
-				usedWordIds: { push: newUsedWordIds },
-			},
-		})
-
-		return { round, teamScore: newTeamScore, gameFinished, winnerId, nextTeamIndex, nextRoundNumber }
-	})
-
-	const duration = Date.now() - startTime
-	console.log(`[POST /api/games/${id}/rounds] completed in ${duration}ms, gameFinished=${gameFinished}`)
-
-	return NextResponse.json(result)
+		return NextResponse.json(result)
 	} catch (error) {
 		const duration = Date.now() - startTime
-		console.error(`[POST /api/games/${id}/rounds] error after ${duration}ms:`, error)
+		console.error(`[POST /api/games/${id || 'unknown'}/rounds] error after ${duration}ms:`, error)
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
 	}
 }

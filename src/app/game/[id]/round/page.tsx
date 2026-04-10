@@ -4,11 +4,11 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { GameFromAPI, WordInRound } from '@/types'
 import { useTimer } from '@/hooks/useTimer'
-import Container from '@/components/layout/Container'
 import Timer from '@/components/ui/Timer'
 import WordCard from '@/components/game/WordCard'
 import RoundSummary from '@/components/game/RoundSummary'
 import Button from '@/components/ui/Button'
+import Modal from '@/components/ui/Modal'
 
 export default function RoundPage() {
 	const router = useRouter()
@@ -21,7 +21,7 @@ export default function RoundPage() {
 	const [showSummary, setShowSummary] = useState(false) // Показывать итоги?
 	const [loading, setLoading] = useState(true)
 	const [saving, setSaving] = useState(false)
-	const [roundStarted, setRoundStarted] = useState(false)
+	const [isPaused, setIsPaused] = useState(false) // Состояние паузы
 
 	// useRef — позволяет хранить значение, доступное внутри callback-ов
 	// без этого callback handleTimeUp будет видеть старые значения words
@@ -29,6 +29,7 @@ export default function RoundPage() {
 	wordsRef.current = words
 	const currentIndexRef = useRef(currentIndex)
 	currentIndexRef.current = currentIndex
+	const hasFetchedRef = useRef(false) // Защита от повторной загрузки
 
 	// Что делать когда таймер истёк
 	const handleTimeUp = useCallback(() => {
@@ -51,13 +52,17 @@ export default function RoundPage() {
 	}, [])
 
 	// Используем наш хук таймера
-	const { timeLeft, start } = useTimer({
+	const { timeLeft, start, pause } = useTimer({
 		initialTime: game?.roundTime ?? 60,
 		onTimeUp: handleTimeUp,
 	})
 
 	// Загружаем данные игры и слова при открытии страницы
 	useEffect(() => {
+		// Защита от повторной загрузки (React.StrictMode вызывает эффекты дважды)
+		if (hasFetchedRef.current) return
+		hasFetchedRef.current = true
+
 		const fetchData = async () => {
 			try {
 				// Делаем два запроса параллельно (быстрее чем последовательно)
@@ -72,6 +77,7 @@ export default function RoundPage() {
 
 					// Диагностика: проверяем что загружается из БД
 					console.log('Game loaded with roundTime:', gameData.roundTime, 'winScore:', gameData.winScore)
+					console.log('Words loaded:', wordsData.length, 'First word:', wordsData[0]?.text)
 
 					setGame(gameData)
 					// Преобразуем слова в формат для раунда
@@ -92,8 +98,16 @@ export default function RoundPage() {
 		fetchData()
 	}, [gameId])
 
+	// Автозапуск таймера после загрузки данных
+	useEffect(() => {
+		if (!loading && game) {
+			start()
+		}
+	}, [loading, game, start])
+
 	// Обработка нажатия "Угадано" или "Пропуск"
 	const handleGuess = (guessed: boolean) => {
+		console.log('handleGuess called:', { currentIndex, word: words[currentIndex]?.text, guessed })
 		const updated = [...words]
 		updated[currentIndex] = { ...updated[currentIndex], guessed }
 		setWords(updated)
@@ -154,19 +168,27 @@ export default function RoundPage() {
 		}
 	}
 
-	// Запуск раунда
-	const handleStartRound = () => {
-		setRoundStarted(true)
-		start() // Запускаем таймер
+	// Обработка паузы
+	const handlePause = () => {
+		pause()
+		setIsPaused(true)
+	}
+
+	const handleResume = () => {
+		start()
+		setIsPaused(false)
+	}
+
+	const handleEndRound = () => {
+		setIsPaused(false)
+		handleTimeUp()
 	}
 
 	if (loading || !game) {
 		return (
-			<Container>
-				<div className='text-center py-12'>
-					<div className='inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary' />
-				</div>
-			</Container>
+			<div className='flex items-center justify-center min-h-screen'>
+				<div className='inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary' />
+			</div>
 		)
 	}
 
@@ -174,33 +196,25 @@ export default function RoundPage() {
 	const currentWord = currentIndex < words.length ? words[currentIndex] : null
 	const noMoreWords = currentIndex >= words.length
 
-	// Экран перед началом раунда
-	if (!roundStarted) {
-		return (
-			<Container>
-				<div className='flex flex-col items-center justify-center min-h-[calc(100vh-180px)]'>
-					<p className='text-text-secondary mb-4'>Готовы? Нажмите кнопку, чтобы начать раунд</p>
-					<Button
-						size='xl'
-						onClick={handleStartRound}
-					>
-						▶️ Начать раунд
-					</Button>
-				</div>
-			</Container>
-		)
-	}
+	console.log('RoundPage render:', { currentIndex, currentWord: currentWord?.text, wordsLength: words.length, loading })
 
 	return (
 		<>
 			{/* Основной экран — таймер, слово, кнопки */}
 			<div className='flex flex-col h-[calc(100vh-57px)]'>
-				{/* Таймер сверху */}
-				<div className='pt-4 px-4'>
+				{/* Таймер сверху с кнопкой паузы */}
+				<div className='pt-4 px-4 relative'>
 					<Timer
 						timeLeft={timeLeft}
 						totalTime={game.roundTime}
 					/>
+					{/* Кнопка паузы */}
+					<button
+						onClick={handlePause}
+						className='absolute top-4 right-4 bg-surface-light hover:bg-surface-lighter text-text-primary rounded-lg px-3 py-2 text-sm font-medium transition-colors'
+					>
+						⏸️ Пауза
+					</button>
 				</div>
 
 				{/* Слово по центру */}
@@ -244,6 +258,34 @@ export default function RoundPage() {
 				penaltySkip={game.penaltySkip}
 				teamName={currentTeam.name}
 			/>
+
+			{/* Модальное окно паузы */}
+			<Modal
+				isOpen={isPaused}
+				onClose={handleResume}
+				title='Пауза'
+			>
+				<div className='space-y-4'>
+					<p className='text-text-secondary text-center'>Игра приостановлена</p>
+					<div className='space-y-2'>
+						<Button
+							fullWidth
+							size='lg'
+							onClick={handleResume}
+						>
+							▶️ Продолжить
+						</Button>
+						<Button
+							fullWidth
+							size='lg'
+							variant='danger'
+							onClick={handleEndRound}
+						>
+							⏹️ Завершить раунд
+						</Button>
+					</div>
+				</div>
+			</Modal>
 		</>
 	)
 }
