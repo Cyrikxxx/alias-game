@@ -1,36 +1,299 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎮 Alias Game
 
-## Getting Started
+[![Next.js](https://img.shields.io/badge/Next.js-16+-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19+-61DAFB?style=flat&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-5+-2D3748?style=flat&logo=prisma)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-336791?style=flat&logo=postgresql)](https://www.postgresql.org/)
 
-First, run the development server:
+Многопользовательская онлайн-игра "Alias" (Объясни слово) на Next.js с PostgreSQL. Игроки объясняют слова своей команде, зарабатывая очки за угаданные слова.
+
+## 🚀 Особенности
+
+- **Next.js 16+** с App Router
+- **Полная TypeScript** поддержка
+- **10 категорий слов** с более чем 600 словами
+- **2-4 команды** по 2-6 игроков в каждой
+- **Настраиваемое время раунда** (30-120 секунд)
+- **Гибкие условия победы** (25-100 очков)
+- **Система подсчёта очков** с опциональными штрафами
+- **Звуковые оповещения** об окончании времени
+- **История игр** с сохранением по сессиям
+- **Адаптивный дизайн** для всех устройств
+
+## 📂 Структура проекта
+
+```
+└── 📁alias-game
+    └── 📁app
+        └── 📁api
+            └── 📁categories
+                ├── route.ts
+            └── 📁games
+                └── 📁[id]
+                    └── 📁rounds
+                        ├── route.ts
+                    └── 📁words
+                        ├── route.ts
+                    ├── route.ts
+                ├── route.ts
+        └── 📁game
+            └── 📁[id]
+                ├── page.tsx
+        └── 📁history
+            ├── page.tsx
+        └── 📁new-game
+            ├── page.tsx
+        └── 📁results
+            └── 📁[id]
+                ├── page.tsx
+        ├── favicon.ico
+        ├── globals.css
+        ├── layout.tsx
+        ├── page.tsx
+    └── 📁components
+        ├── GameBoard.tsx
+        ├── GameSetup.tsx
+        ├── ResultsView.tsx
+    └── 📁lib
+        ├── prisma.ts
+    └── 📁prisma
+        └── 📁migrations
+        ├── schema.prisma
+        ├── seed.ts
+    └── 📁types
+        ├── game.ts
+    ├── .env
+    ├── .gitignore
+    ├── next.config.ts
+    ├── package.json
+    ├── tailwind.config.ts
+    └── tsconfig.json
+```
+
+## 🛠 Установка
+
+1. Клонировать репозиторий:
+
+```bash
+git clone <repository-url>
+cd alias-game
+```
+
+2. Установить зависимости:
+
+```bash
+npm install
+```
+
+3. Настроить окружение:
+
+```bash
+# Создайте файл .env в корне проекта
+cp .env.example .env
+# Заполните необходимые переменные
+```
+
+4. Настроить базу данных:
+
+```bash
+# Примените миграции
+npx prisma migrate deploy
+
+# Заполните БД начальными данными (10 категорий, 600+ слов)
+npx prisma db seed
+```
+
+5. Запустить проект:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Откройте [http://localhost:3000](http://localhost:3000) в браузере.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🔧 Конфигурация
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Обязательные переменные окружения (`.env`):
 
-## Learn More
+```ini
+# Database
+DATABASE_URL="postgresql://user:password@host:5432/database?sslmode=require"
 
-To learn more about Next.js, take a look at the following resources:
+# Optional: для production
+POSTGRES_PRISMA_URL="postgresql://user:password@host:5432/database?sslmode=require&pgbouncer=true&connect_timeout=15"
+POSTGRES_URL_NON_POOLING="postgresql://user:password@host:5432/database?sslmode=require"
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Получение DATABASE_URL от Neon:**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Зарегистрируйтесь на [neon.tech](https://neon.tech)
+- Создайте новый проект
+- Скопируйте Connection String из раздела "Connection Details"
 
-## Deploy on Vercel
+## 🧩 Основные технологии
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Frontend**:
+  ![Next.js](https://img.shields.io/badge/-Next.js-000?logo=next.js)
+  ![React](https://img.shields.io/badge/-React-61DAFB?logo=react)
+  ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?logo=typescript)
+- **Стили**:
+  ![Tailwind CSS](https://img.shields.io/badge/-Tailwind_CSS-38B2AC?logo=tailwind-css)
+- **База данных**:
+  ![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-336791?logo=postgresql)
+  ![Prisma](https://img.shields.io/badge/-Prisma-2D3748?logo=prisma)
+- **Deployment**:
+  ![Vercel](https://img.shields.io/badge/-Vercel-000?logo=vercel)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🌐 API Endpoints
+
+| Метод  | Путь                     | Описание                    |
+| ------ | ------------------------ | --------------------------- |
+| GET    | /api/games?sessionId=xxx | Получить все игры сессии    |
+| POST   | /api/games               | Создать новую игру          |
+| GET    | /api/games/[id]          | Получить игру по ID         |
+| DELETE | /api/games/[id]          | Удалить игру                |
+| POST   | /api/games/[id]/rounds   | Сохранить результаты раунда |
+| GET    | /api/games/[id]/words    | Получить слова для раунда   |
+| GET    | /api/categories          | Получить все категории      |
+
+## 🎯 Игровой процесс
+
+### 1. Создание игры
+
+- Выберите количество команд (2-4)
+- Добавьте игроков в каждую команду (2-6 игроков)
+- Настройте время раунда (30-120 секунд)
+- Установите очки для победы (25-100)
+- Выберите категории слов
+- Включите/выключите штраф за пропуск
+
+### 2. Раунд
+
+- Игрок объясняет слова своей команде
+- Нажмите "Угадано" (+1 очко) или "Пропустить" (-1 очко при включенном штрафе)
+- Используйте паузу при необходимости
+- Раунд завершается по истечении времени или нажатию "Завершить раунд"
+
+### 3. Результаты
+
+- Просмотр таблицы счёта
+- История всех раундов
+- Определение победителя при достижении целевого счёта
+
+### 4. История
+
+- Все игры сохраняются по sessionId
+- Просмотр завершённых игр
+- Удаление старых игр
+
+## 📚 Категории слов
+
+Игра включает **10 категорий** с более чем **600 словами**:
+
+| №   | Категория            | Количество слов |
+| --- | -------------------- | --------------- |
+| 1   | Животные             | 91              |
+| 2   | Еда и напитки        | 76              |
+| 3   | Профессии            | 60              |
+| 4   | Спорт                | 52              |
+| 5   | Путешествия и страны | 66              |
+| 6   | Фильмы и сериалы     | 64              |
+| 7   | Природа              | 71              |
+| 8   | Быт и предметы       | 68              |
+| 9   | Действия             | 62              |
+| 10  | Абстрактные понятия  | 51              |
+
+## 🗄️ База данных
+
+Проект использует **Prisma ORM** со следующей схемой:
+
+- **Category** - Категории слов
+- **Word** - Слова с привязкой к категориям
+- **Game** - Игровые сессии
+- **Team** - Команды в игре
+- **Player** - Игроки в командах
+- **Round** - Раунды игры
+- **RoundWord** - Результаты слов в раунде
+
+### Полезные команды Prisma
+
+```bash
+# Открыть Prisma Studio (GUI для БД)
+npx prisma studio
+
+# Создать новую миграцию
+npx prisma migrate dev --name migration_name
+
+# Применить миграции в production
+npx prisma migrate deploy
+
+# Сгенерировать Prisma Client
+npx prisma generate
+
+# Пересоздать БД и применить seed
+npx prisma migrate reset
+```
+
+## 🌐 Деплой на Vercel
+
+### 1. Подготовка
+
+- Убедитесь, что база данных Neon настроена
+- Все переменные окружения готовы
+
+### 2. Деплой через Vercel CLI
+
+```bash
+# Установите Vercel CLI
+npm i -g vercel
+
+# Деплой
+vercel
+
+# Production деплой
+vercel --prod
+```
+
+### 3. Деплой через Vercel Dashboard
+
+- Импортируйте проект с GitHub
+- Добавьте переменные окружения:
+  - `DATABASE_URL`
+  - `POSTGRES_PRISMA_URL` (опционально)
+  - `POSTGRES_URL_NON_POOLING` (опционально)
+- Vercel автоматически определит Next.js и настроит build
+
+### 4. После деплоя
+
+```bash
+# Примените миграции к production БД
+npx prisma migrate deploy
+
+# Заполните БД данными (если нужно)
+npx prisma db seed
+```
+
+## 📝 Разработка
+
+```bash
+# Запуск dev сервера
+npm run dev
+
+# Build для production
+npm run build
+
+# Запуск production сборки
+npm start
+
+# Линтинг
+npm run lint
+```
+
+## 📄 Лицензия
+
+Этот проект создан для образовательных целей.
+
+---
+
+> **Pet-project** разработан с ❤️ для изучения современных веб-технологий
