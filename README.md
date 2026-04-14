@@ -8,6 +8,10 @@
 
 Многопользовательская онлайн-игра "Alias" (Объясни слово) на Next.js с PostgreSQL. Игроки объясняют слова своей команде, зарабатывая очки за угаданные слова.
 
+## 🌐 Демо
+
+**[🎮 Играть онлайн](https://alias-game-lyart.vercel.app/)**
+
 ## 🚀 Особенности
 
 - **Next.js 16+** с App Router
@@ -88,11 +92,22 @@ npm install
 
 3. Настроить окружение:
 
-```bash
-# Создайте файл .env в корне проекта
-cp .env.example .env
-# Заполните необходимые переменные
+Создайте файл `.env` в корне проекта:
+
+```ini
+# Database
+DATABASE_URL="postgresql://user:password@host:5432/database?sslmode=require"
+
+# Optional: для production
+POSTGRES_PRISMA_URL="postgresql://user:password@host:5432/database?sslmode=require&pgbouncer=true&connect_timeout=15"
+POSTGRES_URL_NON_POOLING="postgresql://user:password@host:5432/database?sslmode=require"
 ```
+
+**Получение DATABASE_URL от Neon:**
+
+- Зарегистрируйтесь на [neon.tech](https://neon.tech)
+- Создайте новый проект
+- Скопируйте Connection String из раздела "Connection Details"
 
 4. Настроить базу данных:
 
@@ -288,6 +303,35 @@ npm start
 
 # Линтинг
 npm run lint
+```
+
+## 🐛 Решение проблем
+
+### ❌ "Environment variable not found: DATABASE_URL"
+
+**Решение:** Создайте файл `.env` в корне проекта и заполните `DATABASE_URL`
+
+### ❌ "Error: P1001: Can't reach database server"
+
+**Решение:**
+
+- Проверьте правильность `DATABASE_URL`
+- Для Neon: убедитесь, что проект активен (не в режиме Sleep)
+
+### ❌ "Cannot find module '@prisma/client'"
+
+**Решение:**
+
+```bash
+npx prisma generate
+```
+
+### ❌ Пустой список категорий
+
+**Решение:**
+
+```bash
+npx prisma db seed
 ```
 
 ## 📄 Лицензия
