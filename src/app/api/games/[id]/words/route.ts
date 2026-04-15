@@ -9,9 +9,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 	try {
 		id = (await params).id
 
-		console.log(`[GET /api/games/${id}/words] started`)
-
-		// Оптимизированный запрос: получаем categoryIds и используем подзапрос вместо notIn
 		const game = await prisma.game.findUnique({
 			where: { id },
 			select: {
@@ -47,8 +44,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 		const shuffled = shuffleArray(words).slice(0, WORDS_BATCH_SIZE)
 
 		const duration = Date.now() - startTime
-		console.log(`[GET /api/games/${id}/words] completed in ${duration}ms, returned ${shuffled.length} words`)
-
 		return NextResponse.json(shuffled)
 	} catch (error) {
 		const duration = Date.now() - startTime

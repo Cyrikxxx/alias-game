@@ -17,7 +17,10 @@ export default function ScoreBoard({ teams, currentTeamIndex, compact = false, s
 	const sorted = [...teams].sort((a, b) => a.order - b.order)
 
 	return (
-		<div className={cn('grid gap-2', compact ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-1')}>
+		<div className={cn(
+			'grid gap-4',
+			compact ? 'grid-cols-2 max-w-5xl mx-auto' : 'grid-cols-1'
+		)}>
 			{sorted.map(team => {
 				const color = TEAM_COLORS[team.order % TEAM_COLORS.length]
 				const isCurrent = team.order === currentTeamIndex
@@ -26,27 +29,27 @@ export default function ScoreBoard({ teams, currentTeamIndex, compact = false, s
 					<div
 						key={team.id}
 						className={cn(
-							'rounded-xl px-4 py-2 border-2 transition-all',
+							'rounded-2xl px-8 py-6 border-2 transition-all min-h-[140px]',
 							color.bg,
 							isCurrent ? color.border : 'border-transparent',
 							isCurrent && 'ring-2 ring-primary/30'
 						)}
 					>
-						<div className='flex justify-between items-center'>
-							<span className={cn('font-medium text-sm truncate', color.text)}>{team.name}</span>
-							<span className='text-text-primary font-bold text-lg ml-2'>{team.score}</span>
+						<div className='flex justify-between items-center mb-1'>
+							<span className={cn('font-semibold text-xl truncate', color.text)}>{team.name}</span>
+							<span className='text-text-primary font-bold text-3xl ml-4'>{team.score}</span>
 						</div>
 						
 						{/* Список игроков */}
 						{showPlayers && team.players.length > 0 && (
-							<div className='mt-2 space-y-1'>
+							<div className='mt-4 space-y-2'>
 								{team.players.sort((a, b) => a.order - b.order).map(player => {
 									const isCurrentPlayer = player.id === currentPlayerId
 									return (
 										<div
 											key={player.id}
 											className={cn(
-												'text-xs flex items-center gap-1',
+												'text-base flex items-center gap-2',
 												isCurrentPlayer ? cn('font-semibold', color.text) : 'text-text-secondary'
 											)}
 										>

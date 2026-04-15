@@ -13,9 +13,6 @@ interface RoundSummaryProps {
 	teamName: string
 }
 
-// Модальное окно итогов раунда
-// Показывает все слова с пометками ✅/❌
-// Можно нажать на слово чтобы исправить ошибку
 export default function RoundSummary({
 	isOpen,
 	words,
@@ -24,19 +21,10 @@ export default function RoundSummary({
 	penaltySkip,
 	teamName,
 }: RoundSummaryProps) {
-	// Считаем статистику
 	const answered = words.filter(w => w.guessed !== null)
 	const guessedCount = answered.filter(w => w.guessed === true).length
 	const skippedCount = answered.filter(w => w.guessed === false).length
 	const score = guessedCount - (penaltySkip ? skippedCount : 0)
-
-	// Диагностика: проверяем расчет очков
-	console.log('RoundSummary scoring:', {
-		guessedCount,
-		skippedCount,
-		penaltySkip,
-		score,
-	})
 
 	return (
 		<Modal

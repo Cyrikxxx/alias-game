@@ -43,20 +43,59 @@ export async function GET(request: NextRequest) {
 // POST /api/games — создать новую игру
 export async function POST(request: NextRequest) {
 	try {
-		// Читаем тело запроса (JSON от клиента)
 		const body = await request.json()
 		const { sessionId, settings, teams } = body
 
-		// Диагностика: проверяем что приходит от клиента
-		console.log('Creating game with settings:', settings)
-
-		// Проверяем что данные корректные
 		if (!sessionId || !settings || !teams || teams.length < 2) {
 			return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
 		}
 
-		// Создаём игру в БД одним запросом (вместе с командами и игроками)
-		// Prisma поддерживает вложенное создание — очень удобно!
+		// Валидация настроек
+		if (typeof settings.roundTime !== 'number' || settings.roundTime < 10 || settings.roundTime > 300) {
+			return NextResponse.json({ error: 'roundTime must be between 10 and 300' }, { status: 400 })
+		}
+
+		if (typeof settings.winScore !== 'number' || settings.winScore < 0 || settings.winScore > 1000) {
+			return NextResponse.json({ error: 'winScore must be between 0 and 1000' }, { status: 400 })
+		}
+
+		if (typeof settings.penaltySkip !== 'boolean') {
+			return NextResponse.json({ error: 'penaltySkip must be boolean' }, { status: 400 })
+		}
+
+		if (!Array.isArray(settings.categoryIds) || settings.categoryIds.length === 0) {
+			return NextResponse.json({ error: 'At least one category required' }, { status: 400 })
+		}
+
+		// Валидация команд
+		if (teams.length > 4) {
+			return NextResponse.json({ error: 'Maximum 4 teams allowed' }, { status: 400 })
+		}
+
+		for (const team of teams) {
+			if (!team.name || typeof team.name !== 'string' || team.name.trim().length === 0) {
+				return NextResponse.json({ error: 'Team name is required' }, { status: 400 })
+			}
+
+			if (team.name.length > 50) {
+				return NextResponse.json({ error: 'Team name too long (max 50 characters)' }, { status: 400 })
+			}
+
+			if (!Array.isArray(team.players) || team.players.length < 2 || team.players.length > 6) {
+				return NextResponse.json({ error: 'Each team must have 2-6 players' }, { status: 400 })
+			}
+
+			for (const player of team.players) {
+				if (!player.name || typeof player.name !== 'string' || player.name.trim().length === 0) {
+					return NextResponse.json({ error: 'Player name is required' }, { status: 400 })
+				}
+
+				if (player.name.length > 50) {
+					return NextResponse.json({ error: 'Player name too long (max 50 characters)' }, { status: 400 })
+				}
+			}
+		}
+
 		const game = await prisma.game.create({
 			data: {
 				sessionId,

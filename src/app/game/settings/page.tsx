@@ -14,7 +14,6 @@ export default function SettingsPage() {
 	const [loading, setLoading] = useState(true)
 	const [creating, setCreating] = useState(false)
 
-	// Настройки по умолчанию
 	const [settings, setSettings] = useState<GameSettings>({
 		roundTime: 60,
 		winScore: 50,
@@ -22,14 +21,12 @@ export default function SettingsPage() {
 		categoryIds: [],
 	})
 
-	// Загружаем категории с сервера
 	useEffect(() => {
 		const fetchCategories = async () => {
 			try {
 				const res = await fetch('/api/categories')
 				const data = await res.json()
 				setCategories(data)
-				// По умолчанию выбираем все категории
 				setSettings(s => ({
 					...s,
 					categoryIds: data.map((c: CategoryFromAPI) => c.id),
@@ -43,9 +40,7 @@ export default function SettingsPage() {
 		fetchCategories()
 	}, [])
 
-	// Создание игры
 	const handleStartGame = async () => {
-		// Читаем команды, сохранённые на предыдущей странице
 		const teamsJson = localStorage.getItem('alias_setup_teams')
 		if (!teamsJson) {
 			router.push('/game/new')
@@ -55,11 +50,8 @@ export default function SettingsPage() {
 		const teams: TeamSetup[] = JSON.parse(teamsJson)
 		const sessionId = getSessionId()
 
-		console.log('Starting game with settings:', settings)
-
 		setCreating(true)
 		try {
-			// Отправляем POST-запрос для создания игры
 			const res = await fetch('/api/games', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -68,8 +60,8 @@ export default function SettingsPage() {
 
 			if (res.ok) {
 				const game = await res.json()
-				localStorage.removeItem('alias_setup_teams') // Очищаем
-				router.push(`/game/${game.id}/turn`) // Переходим к игре
+				localStorage.removeItem('alias_setup_teams')
+				router.push(`/game/${game.id}/turn`)
 			}
 		} catch (error) {
 			console.error('Failed to create game:', error)

@@ -9,8 +9,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 		const { searchParams } = new URL(request.url)
 		const includeRounds = searchParams.get('includeRounds') === 'true'
 
-		console.log(`[GET /api/games/${id}] includeRounds=${includeRounds}`)
-
 		const game = await prisma.game.findUnique({
 			where: { id },
 			select: {
@@ -55,8 +53,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 		}
 
 		const duration = Date.now() - startTime
-		console.log(`[GET /api/games/${id}] completed in ${duration}ms`)
-
 		return NextResponse.json(game)
 	} catch (error) {
 		const duration = Date.now() - startTime
@@ -69,6 +65,24 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 	try {
 		const { id } = await params
 		const body = await request.json()
+		const sessionId = request.nextUrl.searchParams.get('sessionId')
+
+		if (!sessionId) {
+			return NextResponse.json({ error: 'sessionId required' }, { status: 400 })
+		}
+
+		const existingGame = await prisma.game.findUnique({
+			where: { id },
+			select: { sessionId: true },
+		})
+
+		if (!existingGame) {
+			return NextResponse.json({ error: 'Game not found' }, { status: 404 })
+		}
+
+		if (existingGame.sessionId !== sessionId) {
+			return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+		}
 
 		const game = await prisma.game.update({
 			where: { id },
@@ -90,6 +104,25 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params
+		const sessionId = request.nextUrl.searchParams.get('sessionId')
+
+		if (!sessionId) {
+			return NextResponse.json({ error: 'sessionId required' }, { status: 400 })
+		}
+
+		const existingGame = await prisma.game.findUnique({
+			where: { id },
+			select: { sessionId: true },
+		})
+
+		if (!existingGame) {
+			return NextResponse.json({ error: 'Game not found' }, { status: 404 })
+		}
+
+		if (existingGame.sessionId !== sessionId) {
+			return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+		}
+
 		await prisma.game.delete({ where: { id } })
 		return NextResponse.json({ success: true })
 	} catch (error) {
