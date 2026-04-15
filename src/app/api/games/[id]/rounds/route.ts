@@ -8,12 +8,29 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 		id = (await params).id
 
 		const body = await request.json()
-		const { teamId, playerName, words } = body
+		const { teamId, playerName, words, sessionId } = body
 
-		console.log(`[POST /api/games/${id}/rounds] started, teamId=${teamId}, words=${words.length}`)
-
-		if (!teamId || !playerName || !words) {
+		if (!teamId || !playerName || !words || !sessionId) {
 			return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+		}
+
+		// Валидация данных
+		if (typeof teamId !== 'number') {
+			return NextResponse.json({ error: 'teamId must be a number' }, { status: 400 })
+		}
+
+		if (typeof playerName !== 'string' || playerName.trim().length === 0) {
+			return NextResponse.json({ error: 'playerName is required' }, { status: 400 })
+		}
+
+		if (!Array.isArray(words) || words.length === 0) {
+			return NextResponse.json({ error: 'words array is required' }, { status: 400 })
+		}
+
+		for (const word of words) {
+			if (typeof word.wordId !== 'number' || typeof word.guessed !== 'boolean') {
+				return NextResponse.json({ error: 'Invalid word format' }, { status: 400 })
+			}
 		}
 
 		const game = await prisma.game.findUnique({
@@ -30,19 +47,20 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 			return NextResponse.json({ error: 'Game not found' }, { status: 404 })
 		}
 
+		if (game.sessionId !== sessionId) {
+			return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+		}
+
 		const guessedCount = words.filter((w: { guessed: boolean }) => w.guessed).length
 		const skippedCount = words.filter((w: { guessed: boolean }) => !w.guessed).length
 		const scoreEarned = guessedCount - (game.penaltySkip ? skippedCount : 0)
 
-		// Диагностика: проверяем расчет очков
-		console.log('Round scoring:', {
-			guessedCount,
-			skippedCount,
-			penaltySkip: game.penaltySkip,
-			scoreEarned,
-		})
+		const team = game.teams.find(t => t.id === teamId)
+		
+		if (!team) {
+			return NextResponse.json({ error: 'Team not found' }, { status: 404 })
+		}
 
-		const team = game.teams.find(t => t.id === teamId)!
 		const newTeamScore = Math.max(0, team.score + scoreEarned)
 
 		const numTeams = game.teams.length
@@ -58,15 +76,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 			const updatedTeams = game.teams.map(t => (t.id === teamId ? { ...t, score: newTeamScore } : t))
 			const isEndOfCycle = nextTeamIndex === 0
 
-			console.log('Victory check:', {
-				currentTeamIndex: game.currentTeamIndex,
-				nextTeamIndex,
-				teamScores: updatedTeams.map(t => ({ name: t.name, score: t.score })),
-				winScore: game.winScore,
-				isEndOfCycle,
-			})
-
-			// Проверяем победу только в конце цикла (когда все команды сыграли раунд)
 			if (isEndOfCycle) {
 				const qualifiedTeams = updatedTeams.filter(t => t.score >= game.winScore)
 
@@ -74,12 +83,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 					const winner = qualifiedTeams.reduce((best, t) => (t.score > best.score ? t : best))
 					gameFinished = true
 					winnerId = winner.id
-					console.log('Game finished! Winner:', winner.name, 'Score:', winner.score)
-				} else {
-					console.log('End of cycle but no team reached winScore yet')
 				}
-			} else {
-				console.log('Not end of cycle yet, game continues')
 			}
 		}
 
@@ -126,8 +130,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 		})
 
 		const duration = Date.now() - startTime
-		console.log(`[POST /api/games/${id}/rounds] completed in ${duration}ms, gameFinished=${gameFinished}`)
-
 		return NextResponse.json(result)
 	} catch (error) {
 		const duration = Date.now() - startTime

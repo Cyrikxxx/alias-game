@@ -19,42 +19,32 @@ export default function SettingsForm({ settings, setSettings, categories }: Sett
 	const [customTimeInput, setCustomTimeInput] = useState('')
 	const [customScoreInput, setCustomScoreInput] = useState('')
 
-	// Включить/выключить категорию
 	const toggleCategory = (id: number) => {
 		const ids = settings.categoryIds.includes(id)
-			? settings.categoryIds.filter(c => c !== id) // Убрать
-			: [...settings.categoryIds, id] // Добавить
+			? settings.categoryIds.filter(c => c !== id)
+			: [...settings.categoryIds, id]
 		setSettings({ ...settings, categoryIds: ids })
 	}
 
-	// Выбрать все категории
 	const selectAll = () => {
 		setSettings({ ...settings, categoryIds: categories.map(c => c.id) })
 	}
 
-	// Применить пользовательское время
 	const applyCustomTime = () => {
 		const time = parseInt(customTimeInput)
-		console.log('Applying custom time:', time)
 		if (time >= 10 && time <= 300) {
 			setSettings({ ...settings, roundTime: time })
 			setShowCustomTime(false)
 			setCustomTimeInput('')
-		} else {
-			console.log('Invalid time value:', time)
 		}
 	}
 
-	// Применить пользовательские очки
 	const applyCustomScore = () => {
 		const score = parseInt(customScoreInput)
-		console.log('Applying custom score:', score)
 		if (score >= 10 && score <= 1000) {
 			setSettings({ ...settings, winScore: score })
 			setShowCustomScore(false)
 			setCustomScoreInput('')
-		} else {
-			console.log('Invalid score value:', score)
 		}
 	}
 

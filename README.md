@@ -103,11 +103,20 @@ POSTGRES_PRISMA_URL="postgresql://user:password@host:5432/database?sslmode=requi
 POSTGRES_URL_NON_POOLING="postgresql://user:password@host:5432/database?sslmode=require"
 ```
 
-**Получение DATABASE_URL от Neon:**
+**Получение DATABASE_URL:**
 
-- Зарегистрируйтесь на [neon.tech](https://neon.tech)
-- Создайте новый проект
-- Скопируйте Connection String из раздела "Connection Details"
+**Вариант A: Через Vercel (рекомендуется)**
+
+1. Зайдите на [vercel.com](https://vercel.com) → ваш проект
+2. Перейдите в **Storage** → **Create Database** → **Postgres (Neon)**
+3. После создания БД, перейдите в **.env.local** tab
+4. Скопируйте все переменные и вставьте в ваш локальный `.env` файл
+
+**Вариант B: Напрямую через Neon**
+
+1. Зарегистрируйтесь на [neon.tech](https://neon.tech)
+2. Создайте новый проект
+3. Скопируйте Connection String из раздела "Connection Details"
 
 4. Настроить базу данных:
 
@@ -139,12 +148,6 @@ DATABASE_URL="postgresql://user:password@host:5432/database?sslmode=require"
 POSTGRES_PRISMA_URL="postgresql://user:password@host:5432/database?sslmode=require&pgbouncer=true&connect_timeout=15"
 POSTGRES_URL_NON_POOLING="postgresql://user:password@host:5432/database?sslmode=require"
 ```
-
-**Получение DATABASE_URL от Neon:**
-
-- Зарегистрируйтесь на [neon.tech](https://neon.tech)
-- Создайте новый проект
-- Скопируйте Connection String из раздела "Connection Details"
 
 ## 🧩 Основные технологии
 

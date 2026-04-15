@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { GameFromAPI, WordInRound } from '@/types'
+import { getSessionId } from '@/lib/session'
 import { useTimer } from '@/hooks/useTimer'
 import Timer from '@/components/ui/Timer'
 import WordCard from '@/components/game/WordCard'
@@ -17,24 +18,33 @@ export default function RoundPage() {
 
 	const [game, setGame] = useState<GameFromAPI | null>(null)
 	const [words, setWords] = useState<WordInRound[]>([])
-	const [currentIndex, setCurrentIndex] = useState(0) // Индекс текущего слова
-	const [showSummary, setShowSummary] = useState(false) // Показывать итоги?
+	const [currentIndex, setCurrentIndex] = useState(0)
+	const [showSummary, setShowSummary] = useState(false)
 	const [loading, setLoading] = useState(true)
 	const [saving, setSaving] = useState(false)
-	const [isPaused, setIsPaused] = useState(false) // Состояние паузы
+	const [isPaused, setIsPaused] = useState(false)
+	const audioRef = useRef<HTMLAudioElement | null>(null)
 
-	// useRef — позволяет хранить значение, доступное внутри callback-ов
-	// без этого callback handleTimeUp будет видеть старые значения words
 	const wordsRef = useRef(words)
 	wordsRef.current = words
 	const currentIndexRef = useRef(currentIndex)
 	currentIndexRef.current = currentIndex
-	const hasFetchedRef = useRef(false) // Защита от повторной загрузки
+	const hasFetchedRef = useRef(false)
 
-	// Что делать когда таймер истёк
+	useEffect(() => {
+		audioRef.current = new Audio('/sounds/timer-end.mp3')
+		audioRef.current.preload = 'auto'
+		
+		return () => {
+			if (audioRef.current) {
+				audioRef.current.pause()
+				audioRef.current = null
+			}
+		}
+	}, [])
+
 	const handleTimeUp = useCallback(() => {
 		const updatedWords = [...wordsRef.current]
-		// Если текущее слово ещё не отвечено — помечаем как не угадано
 		if (currentIndexRef.current < updatedWords.length && updatedWords[currentIndexRef.current].guessed === null) {
 			updatedWords[currentIndexRef.current] = {
 				...updatedWords[currentIndexRef.current],
@@ -42,30 +52,26 @@ export default function RoundPage() {
 			}
 		}
 		setWords(updatedWords)
-		setShowSummary(true) // Показываем итоги
+		setShowSummary(true)
 
-		// Пробуем воспроизвести звук (может не сработать без взаимодействия)
-		try {
-			const audio = new Audio('/sounds/timer-end.mp3')
-			audio.play().catch(() => {})
-		} catch {}
+		if (audioRef.current) {
+			audioRef.current.play().catch(err => {
+				console.error('Failed to play sound:', err)
+			})
+		}
 	}, [])
 
-	// Используем наш хук таймера
 	const { timeLeft, start, pause } = useTimer({
 		initialTime: game?.roundTime ?? 60,
 		onTimeUp: handleTimeUp,
 	})
 
-	// Загружаем данные игры и слова при открытии страницы
 	useEffect(() => {
-		// Защита от повторной загрузки (React.StrictMode вызывает эффекты дважды)
 		if (hasFetchedRef.current) return
 		hasFetchedRef.current = true
 
 		const fetchData = async () => {
 			try {
-				// Делаем два запроса параллельно (быстрее чем последовательно)
 				const [gameRes, wordsRes] = await Promise.all([
 					fetch(`/api/games/${gameId}`),
 					fetch(`/api/games/${gameId}/words`),
@@ -75,17 +81,12 @@ export default function RoundPage() {
 					const gameData = await gameRes.json()
 					const wordsData = await wordsRes.json()
 
-					// Диагностика: проверяем что загружается из БД
-					console.log('Game loaded with roundTime:', gameData.roundTime, 'winScore:', gameData.winScore)
-					console.log('Words loaded:', wordsData.length, 'First word:', wordsData[0]?.text)
-
 					setGame(gameData)
-					// Преобразуем слова в формат для раунда
 					setWords(
 						wordsData.map((w: { id: number; text: string }) => ({
 							wordId: w.id,
 							text: w.text,
-							guessed: null, // Ещё не показано
+							guessed: null,
 						}))
 					)
 				}
@@ -98,23 +99,19 @@ export default function RoundPage() {
 		fetchData()
 	}, [gameId])
 
-	// Автозапуск таймера после загрузки данных
 	useEffect(() => {
 		if (!loading && game) {
 			start()
 		}
 	}, [loading, game, start])
 
-	// Обработка нажатия "Угадано" или "Пропуск"
 	const handleGuess = (guessed: boolean) => {
-		console.log('handleGuess called:', { currentIndex, word: words[currentIndex]?.text, guessed })
 		const updated = [...words]
 		updated[currentIndex] = { ...updated[currentIndex], guessed }
 		setWords(updated)
-		setCurrentIndex(prev => prev + 1) // Переходим к следующему слову
+		setCurrentIndex(prev => prev + 1)
 	}
 
-	// Переключение статуса слова в итогах (исправление ошибки)
 	const handleToggleWord = (displayIndex: number) => {
 		const answeredWords = words.filter(w => w.guessed !== null)
 		const actualIndex = words.findIndex(w => w.wordId === answeredWords[displayIndex].wordId)
@@ -128,22 +125,29 @@ export default function RoundPage() {
 		setWords(updated)
 	}
 
-	// Подтверждение итогов — сохраняем в БД и переходим дальше
 	const handleConfirm = async () => {
 		if (!game || saving) return
 
-		const currentTeam = game.teams.find(t => t.order === game.currentTeamIndex)!
+		const currentTeam = game.teams.find(t => t.order === game.currentTeamIndex)
+		
+		if (!currentTeam) {
+			console.error('Current team not found')
+			return
+		}
+
 		const currentPlayer = currentTeam.players[currentTeam.currentPlayerIndex]
 		const answeredWords = words.filter(w => w.guessed !== null)
 
 		setSaving(true)
 		try {
+			const sessionId = getSessionId()
 			const res = await fetch(`/api/games/${gameId}/rounds`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					teamId: currentTeam.id,
 					playerName: currentPlayer.name,
+					sessionId,
 					words: answeredWords.map(w => ({
 						wordId: w.wordId,
 						guessed: w.guessed,
@@ -154,10 +158,8 @@ export default function RoundPage() {
 			if (res.ok) {
 				const result = await res.json()
 				if (result.gameFinished) {
-					// Игра закончена — переходим к результатам
 					router.replace(`/game/${gameId}/results`)
 				} else {
-					// Переходим к следующему ходу
 					router.replace(`/game/${gameId}/turn`)
 				}
 			}
@@ -168,7 +170,6 @@ export default function RoundPage() {
 		}
 	}
 
-	// Обработка паузы
 	const handlePause = () => {
 		pause()
 		setIsPaused(true)
@@ -184,6 +185,11 @@ export default function RoundPage() {
 		handleTimeUp()
 	}
 
+	const currentTeam = useMemo(() => 
+		game?.teams.find(t => t.order === game.currentTeamIndex),
+		[game]
+	)
+
 	if (loading || !game) {
 		return (
 			<div className='flex items-center justify-center min-h-screen'>
@@ -191,24 +197,26 @@ export default function RoundPage() {
 			</div>
 		)
 	}
+	
+	if (!currentTeam) {
+		return (
+			<div className='flex items-center justify-center min-h-screen'>
+				<p className='text-danger'>Ошибка: команда не найдена</p>
+			</div>
+		)
+	}
 
-	const currentTeam = game.teams.find(t => t.order === game.currentTeamIndex)!
 	const currentWord = currentIndex < words.length ? words[currentIndex] : null
 	const noMoreWords = currentIndex >= words.length
 
-	console.log('RoundPage render:', { currentIndex, currentWord: currentWord?.text, wordsLength: words.length, loading })
-
 	return (
 		<>
-			{/* Основной экран — таймер, слово, кнопки */}
 			<div className='flex flex-col h-[calc(100vh-57px)]'>
-				{/* Таймер сверху с кнопкой паузы */}
 				<div className='pt-4 px-4 relative'>
 					<Timer
 						timeLeft={timeLeft}
 						totalTime={game.roundTime}
 					/>
-					{/* Кнопка паузы */}
 					<button
 						onClick={handlePause}
 						className='absolute top-4 right-4 bg-surface-light hover:bg-surface-lighter text-text-primary rounded-lg px-3 py-2 text-sm font-medium transition-colors'
@@ -217,7 +225,6 @@ export default function RoundPage() {
 					</button>
 				</div>
 
-				{/* Слово по центру */}
 				{noMoreWords ? (
 					<div className='flex-1 flex items-center justify-center px-4'>
 						<p className='text-text-secondary text-xl text-center'>Слова закончились! Ждите окончания таймера.</p>
@@ -226,7 +233,6 @@ export default function RoundPage() {
 					<WordCard word={currentWord.text} />
 				) : null}
 
-				{/* Кнопки внизу */}
 				{!noMoreWords && !showSummary && (
 					<div className='p-4 pb-8 flex gap-4'>
 						<Button
@@ -249,7 +255,6 @@ export default function RoundPage() {
 				)}
 			</div>
 
-			{/* Модальное окно итогов */}
 			<RoundSummary
 				isOpen={showSummary}
 				words={words.filter(w => w.guessed !== null)}
@@ -259,7 +264,6 @@ export default function RoundPage() {
 				teamName={currentTeam.name}
 			/>
 
-			{/* Модальное окно паузы */}
 			<Modal
 				isOpen={isPaused}
 				onClose={handleResume}

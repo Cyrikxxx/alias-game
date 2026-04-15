@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { GameFromAPI } from '@/types'
 import { TEAM_COLORS } from '@/constants'
@@ -11,7 +11,6 @@ import { cn } from '@/lib/utils'
 
 export default function TurnPage() {
 	const router = useRouter()
-	// useParams — получает параметры из URL (/game/[id]/turn → id)
 	const params = useParams()
 	const gameId = params.id as string
 
@@ -24,7 +23,6 @@ export default function TurnPage() {
 				const res = await fetch(`/api/games/${gameId}`)
 				if (res.ok) {
 					const data = await res.json()
-					// Если игра уже завершена — показываем результаты
 					if (data.status === 'FINISHED') {
 						router.replace(`/game/${gameId}/results`)
 						return
@@ -43,6 +41,11 @@ export default function TurnPage() {
 		fetchGame()
 	}, [gameId, router])
 
+	const currentTeam = useMemo(() => 
+		game?.teams.find(t => t.order === game.currentTeamIndex),
+		[game]
+	)
+
 	if (loading || !game) {
 		return (
 			<Container>
@@ -52,18 +55,25 @@ export default function TurnPage() {
 			</Container>
 		)
 	}
+	
+	if (!currentTeam) {
+		return (
+			<Container>
+				<div className='text-center py-12'>
+					<p className='text-danger'>Ошибка: команда не найдена</p>
+				</div>
+			</Container>
+		)
+	}
 
-	// Находим текущую команду и текущего игрока
-	const currentTeam = game.teams.find(t => t.order === game.currentTeamIndex)!
 	const currentPlayer = currentTeam.players[currentTeam.currentPlayerIndex]
 	const color = TEAM_COLORS[currentTeam.order % TEAM_COLORS.length]
 
 	return (
 		<Container>
-			<div className='flex flex-col items-center min-h-[calc(100vh-180px)] justify-between py-4'>
-				{/* Таблица счёта */}
-				<div className='w-full mb-6'>
-					<h3 className='text-sm text-text-secondary mb-2 text-center'>Раунд {game.currentRoundNumber}</h3>
+			<div className='flex flex-col items-center min-h-[calc(100vh-120px)] justify-start pt-5 pb-8 px-4'>
+				<div className='w-full max-w-4xl mb-8'>
+					<h3 className='text-lg text-text-secondary mb-4 text-center font-medium'>Раунд {game.currentRoundNumber}</h3>
 					<ScoreBoard
 						teams={game.teams}
 						currentTeamIndex={game.currentTeamIndex}
@@ -73,23 +83,22 @@ export default function TurnPage() {
 					/>
 				</div>
 
-				{/* Информация о текущем ходе */}
-				<div className='text-center flex-1 flex flex-col justify-center'>
-					<div className='bg-surface-light/50 rounded-xl px-4 py-3 max-w-sm mx-auto'>
-						<p className='text-text-secondary text-sm'>
+				<div className='text-center mb-8 w-full max-w-xl'>
+					<div className='bg-surface-light/50 rounded-xl px-6 py-4'>
+						<p className='text-text-secondary text-base leading-relaxed'>
 							📱 Передайте устройство игроку{' '}
-							<span className='text-text-primary font-semibold'>{currentPlayer.name}</span> из команды{' '}
-							<span className={cn('font-semibold', color.text)}>{currentTeam.name}</span>
+							<span className='text-text-primary font-semibold text-lg'>{currentPlayer.name}</span> из команды{' '}
+							<span className={cn('font-semibold text-lg', color.text)}>{currentTeam.name}</span>
 						</p>
 					</div>
 				</div>
 
-				{/* Кнопка старт */}
-				<div className='w-full mt-6'>
+				<div className='w-full max-w-lg mt-auto'>
 					<Button
 						fullWidth
 						size='xl'
 						onClick={() => router.push(`/game/${gameId}/round`)}
+						className='!py-5 !text-xl'
 					>
 						🚀 Старт
 					</Button>
