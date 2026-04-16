@@ -10,6 +10,7 @@ import WordCard from '@/components/game/WordCard'
 import RoundSummary from '@/components/game/RoundSummary'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
+import { Check, X, Pause, Play, Square, Loader2 } from 'lucide-react'
 
 export default function RoundPage() {
 	const router = useRouter()
@@ -193,7 +194,7 @@ export default function RoundPage() {
 	if (loading || !game) {
 		return (
 			<div className='flex items-center justify-center min-h-screen'>
-				<div className='inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary' />
+				<Loader2 className='w-8 h-8 text-primary animate-spin' />
 			</div>
 		)
 	}
@@ -201,7 +202,7 @@ export default function RoundPage() {
 	if (!currentTeam) {
 		return (
 			<div className='flex items-center justify-center min-h-screen'>
-				<p className='text-danger'>Ошибка: команда не найдена</p>
+				<p className='text-destructive' role='alert'>Ошибка: команда не найдена</p>
 			</div>
 		)
 	}
@@ -219,15 +220,17 @@ export default function RoundPage() {
 					/>
 					<button
 						onClick={handlePause}
-						className='absolute top-4 right-4 bg-surface-light hover:bg-surface-lighter text-text-primary rounded-lg px-3 py-2 text-sm font-medium transition-colors'
+						className='absolute top-4 right-4 bg-secondary hover:bg-secondary/80 text-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors flex items-center gap-2'
+						aria-label='Пауза'
 					>
-						⏸️ Пауза
+						<Pause className='w-4 h-4' />
+						Пауза
 					</button>
 				</div>
 
 				{noMoreWords ? (
 					<div className='flex-1 flex items-center justify-center px-4'>
-						<p className='text-text-secondary text-xl text-center'>Слова закончились! Ждите окончания таймера.</p>
+						<p className='text-muted-foreground text-xl text-center'>Слова закончились! Ждите окончания таймера.</p>
 					</div>
 				) : currentWord ? (
 					<WordCard word={currentWord.text} />
@@ -236,20 +239,22 @@ export default function RoundPage() {
 				{!noMoreWords && !showSummary && (
 					<div className='p-4 pb-8 flex gap-4'>
 						<Button
-							variant='danger'
+							variant='destructive'
 							size='xl'
 							fullWidth
 							onClick={() => handleGuess(false)}
 						>
-							❌ Пропуск
+							<X className='w-5 h-5' />
+							Пропуск
 						</Button>
 						<Button
-							variant='success'
+							variant='default'
 							size='xl'
 							fullWidth
 							onClick={() => handleGuess(true)}
 						>
-							✅ Угадал
+							<Check className='w-5 h-5' />
+							Угадал
 						</Button>
 					</div>
 				)}
@@ -270,22 +275,24 @@ export default function RoundPage() {
 				title='Пауза'
 			>
 				<div className='space-y-4'>
-					<p className='text-text-secondary text-center'>Игра приостановлена</p>
+					<p className='text-muted-foreground text-center'>Игра приостановлена</p>
 					<div className='space-y-2'>
 						<Button
 							fullWidth
 							size='lg'
 							onClick={handleResume}
 						>
-							▶️ Продолжить
+							<Play className='w-5 h-5' />
+							Продолжить
 						</Button>
 						<Button
 							fullWidth
 							size='lg'
-							variant='danger'
+							variant='destructive'
 							onClick={handleEndRound}
 						>
-							⏹️ Завершить раунд
+							<Square className='w-5 h-5' />
+							Завершить раунд
 						</Button>
 					</div>
 				</div>

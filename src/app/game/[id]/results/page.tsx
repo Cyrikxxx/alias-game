@@ -7,6 +7,8 @@ import { getSessionId } from '@/lib/session'
 import Container from '@/components/layout/Container'
 import WinnerBanner from '@/components/game/WinnerBanner'
 import Button from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { RotateCcw, Home, Loader2, Crown } from 'lucide-react'
 
 export default function ResultsPage() {
 	const router = useRouter()
@@ -68,8 +70,8 @@ export default function ResultsPage() {
 	if (loading || !game) {
 		return (
 			<Container>
-				<div className='text-center py-12'>
-					<div className='inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary' />
+				<div className='flex items-center justify-center py-12'>
+					<Loader2 className='w-8 h-8 text-primary animate-spin' />
 				</div>
 			</Container>
 		)
@@ -86,19 +88,21 @@ export default function ResultsPage() {
 
 			{/* Финальная таблица */}
 			<div className='mt-8'>
-				<h2 className='text-lg font-semibold text-text-primary mb-3 text-center'>Финальный счёт</h2>
+				<h2 className='text-2xl md:text-3xl font-bold text-foreground mb-4 text-center'>Финальный счёт</h2>
 				<div className='space-y-2'>
 					{sortedTeams.map((team, i) => (
-						<div
+						<Card
 							key={team.id}
-							className='bg-surface rounded-xl px-4 py-3 flex justify-between items-center border border-surface-light'
+							className={`px-6 py-4 flex justify-between items-center ${i === 0 ? 'border-primary bg-primary/10' : ''}`}
 						>
 							<div className='flex items-center gap-3'>
-								<span className='text-2xl'>{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : ''}</span>
-								<span className='text-text-primary font-medium'>{team.name}</span>
+								{i === 0 && <Crown className='w-6 h-6 text-accent' />}
+								{i === 1 && <span className='text-2xl'>🥈</span>}
+								{i === 2 && <span className='text-2xl'>🥉</span>}
+								<span className='text-foreground font-semibold text-lg'>{team.name}</span>
 							</div>
-							<span className='text-2xl font-bold text-text-primary'>{team.score}</span>
-						</div>
+							<span className='text-2xl font-bold font-mono text-foreground'>{team.score}</span>
+						</Card>
 					))}
 				</div>
 			</div>
@@ -110,15 +114,17 @@ export default function ResultsPage() {
 					size='lg'
 					onClick={handlePlayAgain}
 				>
-					🔄 Играть снова
+					<RotateCcw className='w-5 h-5' />
+					Играть снова
 				</Button>
 				<Button
 					fullWidth
 					size='lg'
-					variant='ghost'
+					variant='outline'
 					onClick={() => router.push('/')}
 				>
-					🏠 На главную
+					<Home className='w-5 h-5' />
+					На главную
 				</Button>
 			</div>
 		</Container>

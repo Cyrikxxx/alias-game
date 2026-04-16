@@ -22,8 +22,8 @@ export const TIMER_WARNING_SECONDS = 5
 
 // Цвета для команд (каждая команда получает свой цвет)
 export const TEAM_COLORS = [
-	{ bg: 'bg-indigo-500/20', border: 'border-indigo-500', text: 'text-indigo-400' },
-	{ bg: 'bg-emerald-500/20', border: 'border-emerald-500', text: 'text-emerald-400' },
-	{ bg: 'bg-amber-500/20', border: 'border-amber-500', text: 'text-amber-400' },
-	{ bg: 'bg-rose-500/20', border: 'border-rose-500', text: 'text-rose-400' },
+	{ bg: 'bg-primary/10', border: 'border-primary', text: 'text-primary' },
+	{ bg: 'bg-accent/10', border: 'border-accent', text: 'text-accent' },
+	{ bg: 'bg-secondary', border: 'border-border', text: 'text-foreground' },
+	{ bg: 'bg-muted', border: 'border-border', text: 'text-muted-foreground' },
 ]

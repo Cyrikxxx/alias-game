@@ -3,7 +3,9 @@ import { TeamSetup } from '@/types'
 import { MIN_PLAYERS_PER_TEAM, MAX_PLAYERS_PER_TEAM, MAX_TEAMS, TEAM_COLORS } from '@/constants'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
 import { cn } from '@/lib/utils'
+import { Plus, X } from 'lucide-react'
 
 interface TeamFormProps {
 	teams: TeamSetup[]
@@ -75,12 +77,12 @@ export default function TeamForm({ teams, setTeams, errors }: TeamFormProps) {
 			{teams.map((team, ti) => {
 				const color = TEAM_COLORS[ti % TEAM_COLORS.length]
 				return (
-					<div
+					<Card
 						key={ti}
-						className={cn('rounded-2xl p-4 border-2 animate-fade-in', color.bg, color.border)}
+						className={cn('p-6 animate-fade-in', color.bg, color.border)}
 					>
 						{/* Заголовок команды */}
-						<div className='flex items-center justify-between mb-3'>
+						<div className='flex items-center justify-between mb-4'>
 							<Input
 								value={team.name}
 								onChange={e => updateTeamName(ti, e.target.value)}
@@ -93,32 +95,40 @@ export default function TeamForm({ teams, setTeams, errors }: TeamFormProps) {
 									variant='ghost'
 									size='sm'
 									onClick={() => removeTeam(ti)}
+									className='text-muted-foreground'
+									aria-label='Удалить команду'
 								>
-									✕
+									<X className='w-4 h-4' />
 								</Button>
 							)}
 						</div>
 
 						{/* Список игроков */}
-						<div className='space-y-2'>
+						<div className='space-y-3'>
 							{team.players.map((player, pi) => (
 								<div
 									key={pi}
-									className='flex gap-2 items-center'
+									className='flex gap-2 items-start'
 								>
+									<div className='flex items-center justify-center w-10 h-10 rounded-full bg-secondary/50 text-sm font-semibold shrink-0'>
+										{player.name.trim() ? player.name[0].toUpperCase() : pi + 1}
+									</div>
 									<Input
 										value={player.name}
 										onChange={e => updatePlayerName(ti, pi, e.target.value)}
 										placeholder={`Игрок ${pi + 1}`}
 										error={errors[`team_${ti}_player_${pi}`]}
+										className='flex-1'
 									/>
 									{team.players.length > MIN_PLAYERS_PER_TEAM && (
 										<Button
 											variant='ghost'
 											size='sm'
 											onClick={() => removePlayer(ti, pi)}
+											className='text-muted-foreground shrink-0'
+											aria-label='Удалить игрока'
 										>
-											✕
+											<X className='w-4 h-4' />
 										</Button>
 									)}
 								</div>
@@ -130,12 +140,13 @@ export default function TeamForm({ teams, setTeams, errors }: TeamFormProps) {
 								variant='ghost'
 								size='sm'
 								onClick={() => addPlayer(ti)}
-								className='mt-2'
+								className='mt-3'
 							>
-								+ Добавить игрока
+								<Plus className='w-4 h-4' />
+								Добавить игрока
 							</Button>
 						)}
-					</div>
+					</Card>
 				)
 			})}
 
@@ -145,7 +156,8 @@ export default function TeamForm({ teams, setTeams, errors }: TeamFormProps) {
 					fullWidth
 					onClick={addTeam}
 				>
-					+ Добавить команду
+					<Plus className='w-4 h-4' />
+					Добавить команду
 				</Button>
 			)}
 		</div>
