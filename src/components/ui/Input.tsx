@@ -11,19 +11,19 @@ export default function Input({ error, label, className, ...props }: InputProps)
 	return (
 		<div className='w-full'>
 			{/* Показываем подпись, если передана */}
-			{label && <label className='block text-sm text-text-secondary mb-1'>{label}</label>}
+			{label && <label className='block text-sm font-medium text-foreground mb-2'>{label}</label>}
 			<input
 				className={cn(
-					'w-full px-4 py-3 bg-surface border-2 rounded-xl text-text-primary',
-					'placeholder:text-text-secondary/50 outline-none transition-colors',
-					'focus:border-primary', // При фокусе — фиолетовая рамка
-					error ? 'border-danger' : 'border-surface-light', // Красная рамка если ошибка
+					'w-full h-10 px-4 bg-secondary border rounded-md text-foreground',
+					'placeholder:text-muted-foreground outline-none transition-colors',
+					'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+					error ? 'border-destructive' : 'border-input', // Красная рамка если ошибка
 					className
 				)}
 				{...props}
 			/>
 			{/* Показываем текст ошибки под полем */}
-			{error && <p className='mt-1 text-sm text-danger'>{error}</p>}
+			{error && <p className='mt-1 text-sm text-destructive' role='alert'>{error}</p>}
 		</div>
 	)
 }

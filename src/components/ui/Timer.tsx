@@ -1,6 +1,7 @@
 'use client'
 import { cn } from '@/lib/utils'
 import { TIMER_WARNING_SECONDS } from '@/constants'
+import { Clock } from 'lucide-react'
 
 interface TimerProps {
 	timeLeft: number // Оставшееся время
@@ -19,12 +20,15 @@ export default function Timer({ timeLeft, totalTime }: TimerProps) {
 	const progress = (timeLeft / totalTime) * 100
 
 	return (
-		<div className='flex flex-col items-center gap-2'>
+		<div className='flex flex-col items-center gap-3'>
+			{/* Иконка часов */}
+			<Clock className={cn('w-8 h-8', isWarning ? 'text-destructive' : 'text-primary')} />
+			
 			{/* Крупные цифры таймера */}
 			<div
 				className={cn(
-					'text-6xl md:text-7xl font-mono font-bold tabular-nums',
-					isWarning ? 'text-danger animate-pulse-fast' : 'text-text-primary'
+					'text-5xl md:text-6xl font-mono font-bold tabular-nums',
+					isWarning ? 'text-destructive animate-pulse-fast' : 'text-primary'
 				)}
 			>
 				{/* padStart(2, "0") — добавляет ноль перед однозначным числом: 5 → "05" */}
@@ -32,11 +36,11 @@ export default function Timer({ timeLeft, totalTime }: TimerProps) {
 			</div>
 
 			{/* Прогресс-бар */}
-			<div className='w-full max-w-xs h-2 bg-surface-light rounded-full overflow-hidden'>
+			<div className='w-full max-w-xs h-2 bg-muted rounded-full overflow-hidden'>
 				<div
 					className={cn(
 						'h-full rounded-full transition-all duration-1000 ease-linear',
-						isWarning ? 'bg-danger' : progress > 50 ? 'bg-success' : 'bg-amber-500'
+						isWarning ? 'bg-destructive' : progress > 50 ? 'bg-primary' : 'bg-accent'
 					)}
 					style={{ width: `${progress}%` }}
 				/>

@@ -37,7 +37,7 @@ export default function ScoreBoard({ teams, currentTeamIndex, compact = false, s
 					>
 						<div className='flex justify-between items-center mb-1'>
 							<span className={cn('font-semibold text-xl truncate', color.text)}>{team.name}</span>
-							<span className='text-text-primary font-bold text-3xl ml-4'>{team.score}</span>
+							<span className='text-foreground font-bold text-3xl ml-4'>{team.score}</span>
 						</div>
 						
 						{/* Список игроков */}
@@ -50,7 +50,7 @@ export default function ScoreBoard({ teams, currentTeamIndex, compact = false, s
 											key={player.id}
 											className={cn(
 												'text-base flex items-center gap-2',
-												isCurrentPlayer ? cn('font-semibold', color.text) : 'text-text-secondary'
+												isCurrentPlayer ? cn('font-semibold', color.text) : 'text-muted-foreground'
 											)}
 										>
 											<span>{isCurrentPlayer ? '⭐' : '•'}</span>
