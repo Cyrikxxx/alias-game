@@ -7,6 +7,7 @@ import { TEAM_COLORS } from '@/constants'
 import Container from '@/components/layout/Container'
 import ScoreBoard from '@/components/ui/ScoreBoard'
 import Button from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
 import { cn } from '@/lib/utils'
 import { Play, Loader2 } from 'lucide-react'
 
@@ -17,6 +18,7 @@ export default function TurnPage() {
 
 	const [game, setGame] = useState<GameFromAPI | null>(null)
 	const [loading, setLoading] = useState(true)
+	const [hostPlayerId, setHostPlayerId] = useState<number | undefined>()
 
 	useEffect(() => {
 		const fetchGame = async () => {
@@ -29,6 +31,12 @@ export default function TurnPage() {
 						return
 					}
 					setGame(data)
+					
+					// Получить ID хоста из localStorage
+					const storedHostId = localStorage.getItem(`game_${gameId}_hostId`)
+					if (storedHostId) {
+						setHostPlayerId(parseInt(storedHostId))
+					}
 				} else {
 					router.replace('/')
 				}
@@ -82,18 +90,25 @@ export default function TurnPage() {
 						currentTeamIndex={game.currentTeamIndex}
 						showPlayers={true}
 						currentPlayerId={currentPlayer.id}
+						hostPlayerId={hostPlayerId}
 						compact
 					/>
 				</div>
 
 				<div className='text-center mb-8 w-full max-w-xl'>
-					<div className='bg-card border border-border rounded-lg px-6 py-4'>
-						<p className='text-muted-foreground text-base leading-relaxed'>
+					<Card className='px-8 py-6 shadow-md'>
+						<div className='flex items-center justify-center gap-3 mb-3'>
+							<div className='w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center'>
+								<Play className='w-6 h-6 text-primary' />
+							</div>
+						</div>
+						<p className='text-muted-foreground text-lg leading-relaxed'>
 							Передайте устройство игроку{' '}
-							<span className='text-foreground font-semibold text-lg'>{currentPlayer.name}</span> из команды{' '}
-							<span className={cn('font-semibold text-lg', color.text)}>{currentTeam.name}</span>
+							<span className='text-foreground font-semibold text-xl'>{currentPlayer.name}</span>
+							{' '}из команды{' '}
+							<span className={cn('font-semibold text-xl', color.text)}>{currentTeam.name}</span>
 						</p>
-					</div>
+					</Card>
 				</div>
 
 				<div className='w-full max-w-lg mt-auto'>

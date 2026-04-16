@@ -220,10 +220,10 @@ export default function RoundPage() {
 					/>
 					<button
 						onClick={handlePause}
-						className='absolute top-4 right-4 bg-secondary hover:bg-secondary/80 text-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors flex items-center gap-2'
+						className='absolute top-8 right-4 bg-secondary hover:bg-secondary/80 text-foreground rounded-md px-5 py-3 text-base font-medium transition-colors flex items-center gap-2'
 						aria-label='Пауза'
 					>
-						<Pause className='w-4 h-4' />
+						<Pause className='w-6 h-6' />
 						Пауза
 					</button>
 				</div>

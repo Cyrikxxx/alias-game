@@ -193,7 +193,7 @@ export default function SettingsForm({ settings, setSettings, categories }: Sett
 					value={customTimeInput}
 					onChange={e => setCustomTimeInput(e.target.value)}
 					placeholder='10-300 секунд'
-					className='w-full h-10 px-4 rounded-md bg-secondary text-foreground border border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-mono text-lg'
+					className='w-full h-10 px-4 rounded-md bg-secondary text-foreground border border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 font-mono text-lg'
 					autoFocus
 				/>
 				<div className='flex gap-2'>
@@ -226,7 +226,7 @@ export default function SettingsForm({ settings, setSettings, categories }: Sett
 					value={customScoreInput}
 					onChange={e => setCustomScoreInput(e.target.value)}
 					placeholder='10-1000 очков'
-					className='w-full h-10 px-4 rounded-md bg-secondary text-foreground border border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-mono text-lg'
+					className='w-full h-10 px-4 rounded-md bg-secondary text-foreground border border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 font-mono text-lg'
 					autoFocus
 				/>
 				<div className='flex gap-2'>
