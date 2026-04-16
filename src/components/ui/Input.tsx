@@ -16,7 +16,7 @@ export default function Input({ error, label, className, ...props }: InputProps)
 				className={cn(
 					'w-full h-10 px-4 bg-secondary border rounded-md text-foreground',
 					'placeholder:text-muted-foreground outline-none transition-colors',
-					'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+					'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0',
 					error ? 'border-destructive' : 'border-input', // Красная рамка если ошибка
 					className
 				)}
