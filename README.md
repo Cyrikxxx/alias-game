@@ -29,45 +29,76 @@
 
 ```
 └── 📁alias-game
-    └── 📁app
-        └── 📁api
-            └── 📁categories
-                ├── route.ts
-            └── 📁games
-                └── 📁[id]
-                    └── 📁rounds
-                        ├── route.ts
-                    └── 📁words
+    └── 📁src
+        └── 📁app
+            └── 📁api
+                └── 📁categories
+                    ├── route.ts
+                └── 📁games
+                    └── 📁[id]
+                        └── 📁rounds
+                            ├── route.ts
+                        └── 📁words
+                            ├── route.ts
                         ├── route.ts
                     ├── route.ts
-                ├── route.ts
-        └── 📁game
-            └── 📁[id]
-                ├── page.tsx
-        └── 📁history
+            └── 📁game
+                └── 📁new
+                    ├── page.tsx
+                └── 📁settings
+                    ├── page.tsx
+                └── 📁[id]
+                    └── 📁results
+                        ├── page.tsx
+                    └── 📁round
+                        ├── layout.tsx
+                        ├── page.tsx
+                    └── 📁turn
+                        ├── page.tsx
+                    ├── page.tsx
+            ├── favicon.ico
+            ├── globals.css
+            ├── layout.tsx
             ├── page.tsx
-        └── 📁new-game
-            ├── page.tsx
-        └── 📁results
-            └── 📁[id]
-                ├── page.tsx
-        ├── favicon.ico
-        ├── globals.css
-        ├── layout.tsx
-        ├── page.tsx
-    └── 📁components
-        ├── GameBoard.tsx
-        ├── GameSetup.tsx
-        ├── ResultsView.tsx
-    └── 📁lib
-        ├── prisma.ts
+        └── 📁components
+            └── 📁game
+                ├── GameHistory.tsx
+                ├── RoundSummary.tsx
+                ├── SettingsForm.tsx
+                ├── TeamForm.tsx
+                ├── WinnerBanner.tsx
+                ├── WordCard.tsx
+            └── 📁layout
+                ├── Container.tsx
+                ├── Header.tsx
+            └── 📁ui
+                ├── Badge.tsx
+                ├── Button.tsx
+                ├── Card.tsx
+                ├── ErrorMessage.tsx
+                ├── Input.tsx
+                ├── Modal.tsx
+                ├── ScoreBoard.tsx
+                ├── Switch.tsx
+                ├── Timer.tsx
+                ├── Toggle.tsx
+            ├── ErrorBoundary.tsx
+        └── 📁constants
+            ├── index.ts
+        └── 📁hooks
+            ├── useLocalStorage.ts
+            ├── useTimer.ts
+        └── 📁lib
+            ├── prisma.ts
+            ├── session.ts
+            ├── utils.ts
+        └── 📁types
+            ├── index.ts
     └── 📁prisma
         └── 📁migrations
         ├── schema.prisma
         ├── seed.ts
-    └── 📁types
-        ├── game.ts
-    ├── .env
+    └── 📁public
     ├── .gitignore
     ├── next.config.ts
     ├── package.json
