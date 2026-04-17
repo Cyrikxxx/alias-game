@@ -60,15 +60,15 @@ export default function HomePage() {
 				</div>
 			</div>
 
-			<Button
-				fullWidth
-				size='lg'
-				onClick={() => router.push('/game/new')}
-				className='mb-8'
-			>
-				<Plus className='w-5 h-5' />
-				Новая игра
-			</Button>
+		<Button
+			fullWidth
+			size='xl'
+			onClick={() => router.push('/game/new')}
+			className='mb-8'
+		>
+			<Plus className='w-5 h-5' />
+			Новая игра
+		</Button>
 
 			<div>
 				<h2 className='text-2xl md:text-3xl font-bold text-foreground mb-4'>История игр</h2>

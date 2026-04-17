@@ -82,7 +82,7 @@ export default function TurnPage() {
 		<Container>
 			<div className='flex flex-col items-center min-h-[calc(100vh-120px)] justify-start pt-5 pb-8 px-4'>
 				<div className='w-full max-w-4xl mb-8'>
-					<h3 className='text-lg text-muted-foreground mb-4 text-center font-medium'>
+					<h3 className='text-xl text-foreground mb-6 text-center font-semibold'>
 						Раунд <span className='font-mono'>{game.currentRoundNumber}</span>
 					</h3>
 					<ScoreBoard
@@ -95,21 +95,16 @@ export default function TurnPage() {
 					/>
 				</div>
 
-				<div className='text-center mb-8 w-full max-w-xl'>
-					<Card className='px-8 py-6 shadow-md'>
-						<div className='flex items-center justify-center gap-3 mb-3'>
-							<div className='w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center'>
-								<Play className='w-6 h-6 text-primary' />
-							</div>
-						</div>
-						<p className='text-muted-foreground text-lg leading-relaxed'>
-							Передайте устройство игроку{' '}
-							<span className='text-foreground font-semibold text-xl'>{currentPlayer.name}</span>
-							{' '}из команды{' '}
-							<span className={cn('font-semibold text-xl', color.text)}>{currentTeam.name}</span>
-						</p>
-					</Card>
-				</div>
+			<div className='text-center mb-8 w-full max-w-lg'>
+				<Card className='px-6 py-4 shadow-md'>
+					<p className='text-muted-foreground text-base mb-2'>
+						Передайте устройство игроку
+					</p>
+					<div>
+						<span className='text-foreground font-semibold text-lg block'>{currentPlayer.name}</span>
+					</div>
+				</Card>
+			</div>
 
 				<div className='w-full max-w-lg mt-auto'>
 					<Button

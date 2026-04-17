@@ -279,7 +279,7 @@ export default function RoundPage() {
 					<div className='space-y-2'>
 						<Button
 							fullWidth
-							size='lg'
+							size='xl'
 							onClick={handleResume}
 						>
 							<Play className='w-5 h-5' />
@@ -287,7 +287,7 @@ export default function RoundPage() {
 						</Button>
 						<Button
 							fullWidth
-							size='lg'
+							size='xl'
 							variant='destructive'
 							onClick={handleEndRound}
 						>
