@@ -46,19 +46,19 @@ export default function HomePage() {
 
 	return (
 		<Container>
-			<div className='flex flex-col items-center text-center mb-8 gap-6'>
-				<div className='bg-primary/10 rounded-2xl p-4'>
-					<Gamepad2 className='w-12 h-12 text-primary' />
-				</div>
-				<div>
-					<h1 className='text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-2 tracking-tight text-balance'>
-						Alias Online
-					</h1>
-					<p className='text-lg md:text-xl text-muted-foreground'>
-						Объясняй слова, угадывай, побеждай!
-					</p>
-				</div>
+		<div className='flex flex-col items-center text-center mb-8 gap-4'>
+			<div className='bg-primary/10 rounded-2xl p-3'>
+				<Gamepad2 className='w-10 h-10 text-primary' />
 			</div>
+			<div>
+				<h1 className='text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2 tracking-tight text-balance'>
+					Alias Online
+				</h1>
+				<p className='text-base md:text-lg text-muted-foreground'>
+					Объясняй слова, угадывай, побеждай!
+				</p>
+			</div>
+		</div>
 
 		<Button
 			fullWidth

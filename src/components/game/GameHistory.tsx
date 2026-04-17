@@ -17,11 +17,11 @@ export default function GameHistory({ games, onDelete }: GameHistoryProps) {
 	// Если игр нет — показываем заглушку
 	if (games.length === 0) {
 		return (
-			<div className='text-center py-12'>
-				<div className='bg-muted rounded-2xl p-6 inline-block mb-4'>
-					<Gamepad2 className='w-16 h-16 text-muted-foreground' />
+			<div className='text-center py-6'>
+				<div className='bg-muted rounded-2xl p-4 inline-block mb-3'>
+					<Gamepad2 className='w-12 h-12 text-muted-foreground' />
 				</div>
-				<p className='text-muted-foreground text-lg'>Игр пока нет</p>
+				<p className='text-muted-foreground text-base'>Игр пока нет</p>
 				<p className='text-muted-foreground text-sm mt-1'>Создайте новую игру, чтобы начать!</p>
 			</div>
 		)

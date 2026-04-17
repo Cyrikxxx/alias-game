@@ -212,7 +212,7 @@ export default function RoundPage() {
 
 	return (
 		<>
-			<div className='flex flex-col h-[calc(100vh-57px)]'>
+			<div className='round-page-container flex flex-col h-[calc(100vh-73px)] overflow-hidden touch-none overscroll-none'>
 				<div className='pt-4 px-4 relative'>
 					<Timer
 						timeLeft={timeLeft}
