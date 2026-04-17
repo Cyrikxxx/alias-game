@@ -3,6 +3,7 @@ import { TeamFromAPI } from '@/types'
 import { TEAM_COLORS } from '@/constants'
 import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
+import { Trophy } from 'lucide-react'
 
 interface WinnerBannerProps {
 	winner: TeamFromAPI
@@ -15,7 +16,7 @@ export default function WinnerBanner({ winner }: WinnerBannerProps) {
 
 	// Создаём случайные конфетти при первом рендере
 	useEffect(() => {
-		const colors = ['#6366F1', '#22C55E', '#EF4444', '#F59E0B', '#EC4899', '#06B6D4']
+		const colors = ['hsl(160, 84%, 44%)', 'hsl(36, 95%, 55%)', 'hsl(0, 72%, 51%)', 'hsl(280, 70%, 60%)', 'hsl(200, 80%, 50%)']
 		const items = Array.from({ length: 50 }, (_, i) => ({
 			id: i,
 			x: Math.random() * 100,
@@ -58,11 +59,13 @@ export default function WinnerBanner({ winner }: WinnerBannerProps) {
 			`}</style>
 
 			<div className='animate-bounce-in'>
-				<p className='text-6xl mb-4'>🏆</p>
-				<h1 className='text-3xl md:text-4xl font-bold text-text-primary mb-2'>Победа!</h1>
-				<div className={cn('inline-block px-6 py-3 rounded-2xl', color.bg, 'border-2', color.border)}>
+				<div className='bg-accent/10 rounded-2xl p-6 inline-block mb-4'>
+					<Trophy className='w-16 h-16 text-accent' />
+				</div>
+				<h1 className='text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 tracking-tight'>Победа!</h1>
+				<div className={cn('inline-block px-6 py-3 rounded-xl', color.bg, 'border-2', color.border)}>
 					<span className={cn('text-2xl font-bold', color.text)}>{winner.name}</span>
-					<span className='text-text-primary text-xl ml-3'>{winner.score} очков</span>
+					<span className='text-foreground text-xl ml-3 font-mono'>{winner.score} очков</span>
 				</div>
 			</div>
 		</div>

@@ -2,7 +2,10 @@
 import { GameFromAPI } from '@/types'
 import { formatDate } from '@/lib/utils'
 import Button from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import Badge from '@/components/ui/Badge'
 import Link from 'next/link'
+import { Gamepad2, Users, Trophy, Clock, Eye, Trash2, Play } from 'lucide-react'
 
 interface GameHistoryProps {
 	games: GameFromAPI[]
@@ -14,10 +17,12 @@ export default function GameHistory({ games, onDelete }: GameHistoryProps) {
 	// Если игр нет — показываем заглушку
 	if (games.length === 0) {
 		return (
-			<div className='text-center py-12'>
-				<p className='text-6xl mb-4'>🎮</p>
-				<p className='text-text-secondary text-lg'>Игр пока нет</p>
-				<p className='text-text-secondary/60 text-sm mt-1'>Создайте новую игру, чтобы начать!</p>
+			<div className='text-center py-6'>
+				<div className='bg-muted rounded-2xl p-4 inline-block mb-3'>
+					<Gamepad2 className='w-12 h-12 text-muted-foreground' />
+				</div>
+				<p className='text-muted-foreground text-base'>Игр пока нет</p>
+				<p className='text-muted-foreground text-sm mt-1'>Создайте новую игру, чтобы начать!</p>
 			</div>
 		)
 	}
@@ -31,21 +36,20 @@ export default function GameHistory({ games, onDelete }: GameHistoryProps) {
 				const isFinished = game.status === 'FINISHED'
 
 				return (
-					<div
+					<Card
 						key={game.id}
-						className='bg-surface rounded-xl p-4 border border-surface-light'
+						className='p-4 hover:border-primary hover:bg-primary/5 transition-colors'
 					>
-						<div className='flex justify-between items-start mb-2'>
+						<div className='flex justify-between items-start mb-3'>
 							<div>
 								{/* Бейджик статуса */}
-								<span
-									className={`text-xs px-2 py-0.5 rounded-full ${
-										isFinished ? 'bg-success/20 text-success' : 'bg-amber-500/20 text-amber-400'
-									}`}
-								>
+								<Badge variant={isFinished ? 'default' : 'accent'}>
 									{isFinished ? 'Завершена' : 'В процессе'}
-								</span>
-								<p className='text-text-secondary text-xs mt-1'>{formatDate(game.createdAt)}</p>
+								</Badge>
+								<p className='text-muted-foreground text-xs mt-2 flex items-center gap-1'>
+									<Clock className='w-3 h-3' />
+									{formatDate(game.createdAt)}
+								</p>
 							</div>
 							<div className='flex gap-2'>
 								{/* Кнопка "Продолжить" — только для незавершённых игр */}
@@ -53,8 +57,9 @@ export default function GameHistory({ games, onDelete }: GameHistoryProps) {
 									<Link href={`/game/${game.id}/turn`}>
 										<Button
 											size='sm'
-											variant='primary'
+											variant='default'
 										>
+											<Play className='w-4 h-4' />
 											Продолжить
 										</Button>
 									</Link>
@@ -64,8 +69,9 @@ export default function GameHistory({ games, onDelete }: GameHistoryProps) {
 									variant='ghost'
 									onClick={() => onDelete(game.id)}
 									aria-label='Удалить игру'
+									className='text-destructive hover:text-destructive'
 								>
-									🗑️
+									<Trash2 className='w-4 h-4' />
 								</Button>
 							</div>
 						</div>
@@ -74,15 +80,15 @@ export default function GameHistory({ games, onDelete }: GameHistoryProps) {
 							{sortedTeams.map((team, i) => (
 								<span
 									key={team.id}
-									className='text-sm text-text-primary'
+									className='text-sm text-foreground flex items-center gap-1'
 								>
-									{i === 0 && isFinished ? '🏆 ' : ''}
-									<span className='text-text-secondary'>{team.name}:</span>{' '}
-									<span className='font-bold'>{team.score}</span>
+									{i === 0 && isFinished && <Trophy className='w-4 h-4 text-accent' />}
+									<span className='text-muted-foreground'>{team.name}:</span>{' '}
+									<span className='font-bold font-mono'>{team.score}</span>
 								</span>
 							))}
 						</div>
-					</div>
+					</Card>
 				)
 			})}
 		</div>
