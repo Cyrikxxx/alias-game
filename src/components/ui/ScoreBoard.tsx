@@ -32,59 +32,57 @@ export default function ScoreBoard({
 				const color = TEAM_COLORS[team.order % TEAM_COLORS.length]
 				const isCurrent = team.order === currentTeamIndex
 
-			// Для команд 3 и 4 используем inline стили
-			const useInlineStyles = team.order >= 2
-			const inlineStyles = useInlineStyles
-				? {
-						backgroundColor: `color-mix(in srgb, ${color.cssVar} 10%, transparent)`,
-						borderColor: isCurrent ? color.cssVar : 'transparent',
-					}
-				: {}
+				// Для команд 3 и 4 используем inline стили
+				const useInlineStyles = team.order >= 2
+				const inlineStyles = useInlineStyles
+					? {
+							backgroundColor: `color-mix(in srgb, ${color.cssVar} 10%, transparent)`,
+							borderColor: isCurrent ? color.cssVar : 'transparent',
+						}
+					: {}
 
-			return (
-				<div
-					key={team.id}
-					className={cn(
-						'rounded-xl px-4 py-4 border-2 transition-all shadow-sm w-full',
-						!useInlineStyles && color.bg,
-						isCurrent && !useInlineStyles
-							? cn(color.border)
-							: !isCurrent && 'border-transparent',
-						useInlineStyles && !isCurrent && 'border-transparent',
-						'hover:shadow-md'
-					)}
-					style={
-						useInlineStyles
-							? ({
-									...inlineStyles,
-								} as React.CSSProperties)
-							: undefined
-					}
-				>
-					<div className='flex justify-between items-start mb-2'>
-						<div className='flex items-center gap-1.5'>
-							<span
-								className={cn('font-semibold text-lg tracking-tight', !useInlineStyles && color.text)}
-								style={useInlineStyles ? { color: color.cssVar } : undefined}
-							>
-								{team.name}
-							</span>
-							{showPlayers && (
-								<Badge
-									variant='secondary'
-									className='text-[10px] px-1.5 py-0.5'
+				return (
+					<div
+						key={team.id}
+						className={cn(
+							'rounded-xl px-4 py-4 border-2 transition-all shadow-sm w-full',
+							!useInlineStyles && color.bg,
+							isCurrent && !useInlineStyles ? cn(color.border) : !isCurrent && 'border-transparent',
+							useInlineStyles && !isCurrent && 'border-transparent',
+							'hover:shadow-md'
+						)}
+						style={
+							useInlineStyles
+								? ({
+										...inlineStyles,
+									} as React.CSSProperties)
+								: undefined
+						}
+					>
+						<div className='flex justify-between items-start mb-2'>
+							<div className='flex items-center gap-1.5'>
+								<span
+									className={cn('font-semibold text-lg tracking-tight', !useInlineStyles && color.text)}
+									style={useInlineStyles ? { color: color.cssVar } : undefined}
 								>
-									<Users className='w-2.5 h-2.5' />
-									{team.players.length}
-								</Badge>
-							)}
+									{team.name}
+								</span>
+								{showPlayers && (
+									<Badge
+										variant='secondary'
+										className='text-[10px] px-1.5 py-0.5'
+									>
+										<Users className='w-2.5 h-2.5' />
+										{team.players.length}
+									</Badge>
+								)}
+							</div>
+							<span className='text-foreground font-bold text-3xl ml-2'>{team.score}</span>
 						</div>
-						<span className='text-foreground font-bold text-3xl ml-2'>{team.score}</span>
-					</div>
 
-					{/* Список игроков */}
-					{showPlayers && team.players.length > 0 && (
-						<div className='mt-2 space-y-1'>
+						{/* Список игроков */}
+						{showPlayers && team.players.length > 0 && (
+							<div className='mt-2 space-y-1'>
 								{team.players
 									.sort((a, b) => a.order - b.order)
 									.map(player => {
@@ -95,22 +93,20 @@ export default function ScoreBoard({
 											<div
 												key={player.id}
 												className={cn(
-													'flex items-center gap-2 p-1 rounded-md transition-colors',
-													isCurrentPlayer && 'bg-primary/10'
+													'flex items-center gap-2 px-3 py-2 rounded-md transition-colors',
+													isCurrentPlayer ? 'bg-primary/10' : 'bg-white/5'
 												)}
 											>
 												<span
 													className={cn(
 														'text-sm flex-1',
-														isCurrentPlayer
-															? cn('font-semibold', !useInlineStyles && color.text)
-															: 'text-muted-foreground'
+														isCurrentPlayer ? cn('font-semibold', !useInlineStyles && color.text) : 'text-white/70'
 													)}
 													style={isCurrentPlayer && useInlineStyles ? { color: color.cssVar } : undefined}
 												>
 													{player.name}
 												</span>
-												{isHost && <Crown className='w-3 h-3 text-accent' />}
+												{isHost && <Crown className='w-3.5 h-3.5 text-yellow-400' />}
 												{isCurrentPlayer && <span className='text-base'>⭐</span>}
 											</div>
 										)
