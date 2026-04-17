@@ -80,7 +80,7 @@ export default function TurnPage() {
 
 	return (
 		<Container>
-			<div className='flex flex-col items-center min-h-[calc(100vh-120px)] justify-start pt-5 pb-8 px-4'>
+			<div className='flex flex-col items-center justify-start'>
 				<div className='w-full max-w-4xl mb-8'>
 					<h3 className='text-xl text-foreground mb-6 text-center font-semibold'>
 						Раунд <span className='font-mono'>{game.currentRoundNumber}</span>
@@ -106,7 +106,7 @@ export default function TurnPage() {
 				</Card>
 			</div>
 
-				<div className='w-full max-w-lg mt-auto'>
+				<div className='w-full max-w-lg'>
 					<Button
 						fullWidth
 						size='xl'

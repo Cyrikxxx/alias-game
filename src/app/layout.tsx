@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			<body className={`${inter.className} ${spaceMono.variable}`}>
 				<ErrorBoundary>
 					<Header />
-					<main className='min-h-[calc(100vh-57px)]'>{children}</main>
+					<main>{children}</main>
 				</ErrorBoundary>
 			</body>
 		</html>
