@@ -78,15 +78,15 @@ export default function RoundSummary({
 				</div>
 			</div>
 
-			<p className='text-muted-foreground text-xs text-center mb-3'>Нажмите на слово, чтобы изменить его статус</p>
+		<p className='text-muted-foreground text-xs text-center mb-3'>Нажмите на слово, чтобы изменить его статус</p>
 
-			<Button
-				fullWidth
-				size='lg'
-				onClick={onConfirm}
-			>
-				Подтвердить
-			</Button>
+		<Button
+			fullWidth
+			size='xl'
+			onClick={onConfirm}
+		>
+			Подтвердить
+		</Button>
 		</Modal>
 	)
 }

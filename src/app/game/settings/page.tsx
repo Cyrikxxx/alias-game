@@ -92,34 +92,35 @@ export default function SettingsPage() {
 				categories={categories}
 			/>
 
-			<div className='mt-8 flex gap-3'>
-				<Button
-					variant='ghost'
-					onClick={() => router.push('/game/new')}
-					className='flex-1'
-				>
-					<ArrowLeft className='w-4 h-4' />
-					Назад
-				</Button>
-				<Button
-					onClick={handleStartGame}
-					disabled={settings.categoryIds.length === 0 || creating}
-					className='flex-[2]'
-					size='lg'
-				>
-					{creating ? (
-						<>
-							<Loader2 className='w-5 h-5 animate-spin' />
-							Создаём...
-						</>
-					) : (
-						<>
-							<Play className='w-5 h-5' />
-							Начать игру
-						</>
-					)}
-				</Button>
-			</div>
+		<div className='mt-8 flex gap-3'>
+			<Button
+				variant='ghost'
+				onClick={() => router.push('/game/new')}
+				className='flex-1'
+				size='xl'
+			>
+				<ArrowLeft className='w-4 h-4' />
+				Назад
+			</Button>
+			<Button
+				onClick={handleStartGame}
+				disabled={settings.categoryIds.length === 0 || creating}
+				className='flex-[2]'
+				size='xl'
+			>
+				{creating ? (
+					<>
+						<Loader2 className='w-5 h-5 animate-spin' />
+						Создаём...
+					</>
+				) : (
+					<>
+						<Play className='w-5 h-5' />
+						Начать игру
+					</>
+				)}
+			</Button>
+		</div>
 		</Container>
 	)
 }

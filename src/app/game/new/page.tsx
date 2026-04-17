@@ -62,25 +62,26 @@ export default function NewGamePage() {
 				errors={errors}
 			/>
 
-			<div className='mt-8 flex gap-3'>
-				<Button
-					variant='ghost'
-					onClick={() => router.push('/')}
-					className='flex-1'
-				>
-					<ArrowLeft className='w-4 h-4' />
-					Назад
-				</Button>
-				<Button
-					onClick={handleContinue}
-					disabled={!isValid}
-					className='flex-[2]'
-					size='lg'
-				>
-					Продолжить
-					<ArrowRight className='w-4 h-4' />
-				</Button>
-			</div>
+		<div className='mt-8 flex gap-3'>
+			<Button
+				variant='ghost'
+				onClick={() => router.push('/')}
+				className='flex-1'
+				size='xl'
+			>
+				<ArrowLeft className='w-4 h-4' />
+				Назад
+			</Button>
+			<Button
+				onClick={handleContinue}
+				disabled={!isValid}
+				className='flex-[2]'
+				size='xl'
+			>
+				Продолжить
+				<ArrowRight className='w-4 h-4' />
+			</Button>
+		</div>
 		</Container>
 	)
 }
