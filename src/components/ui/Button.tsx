@@ -3,29 +3,29 @@ import { cn } from '@/lib/utils'
 import { ButtonHTMLAttributes, ReactNode, memo } from 'react'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-	variant?: 'primary' | 'success' | 'danger' | 'ghost' | 'outline'
+	variant?: 'default' | 'secondary' | 'outline' | 'ghost' | 'destructive'
 	size?: 'sm' | 'md' | 'lg' | 'xl'
 	children: ReactNode
 	fullWidth?: boolean
 }
 
 const variants = {
-	primary: 'bg-primary hover:bg-primary-hover text-white',
-	success: 'bg-success hover:bg-success-hover text-white',
-	danger: 'bg-danger hover:bg-danger-hover text-white',
-	ghost: 'bg-transparent hover:bg-surface-light text-text-primary',
-	outline: 'bg-transparent border-2 border-surface-light hover:bg-surface-light text-text-primary',
+	default: 'bg-primary hover:bg-primary/90 text-primary-foreground',
+	secondary: 'bg-secondary hover:bg-secondary/80 text-secondary-foreground',
+	outline: 'bg-transparent border border-border hover:bg-secondary text-foreground',
+	ghost: 'bg-transparent hover:bg-accent/10 text-foreground',
+	destructive: 'bg-destructive hover:bg-destructive/90 text-destructive-foreground',
 }
 
 const sizes = {
-	sm: 'px-3 py-1.5 text-sm',
-	md: 'px-4 py-2 text-base',
-	lg: 'px-6 py-3 text-lg',
-	xl: 'px-8 py-4 text-xl',
+	sm: 'h-9 px-3 text-sm',
+	md: 'h-10 px-4 text-base',
+	lg: 'h-11 px-8 text-lg',
+	xl: 'h-14 px-8 text-xl',
 }
 
 function Button({
-	variant = 'primary',
+	variant = 'default',
 	size = 'md',
 	fullWidth = false,
 	className,
@@ -36,9 +36,10 @@ function Button({
 	return (
 		<button
 			className={cn(
-				'rounded-xl font-semibold transition-all duration-200 active:scale-95',
-				'min-h-[48px] min-w-[48px]',
-				'disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100',
+				'rounded-md font-medium transition-colors duration-200 cursor-pointer',
+				'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0',
+				'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
+				'inline-flex items-center justify-center gap-2',
 				variants[variant],
 				sizes[size],
 				fullWidth && 'w-full',

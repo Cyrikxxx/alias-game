@@ -7,6 +7,7 @@ import { getSessionId } from '@/lib/session'
 import Container from '@/components/layout/Container'
 import SettingsForm from '@/components/game/SettingsForm'
 import Button from '@/components/ui/Button'
+import { ArrowLeft, Play, Loader2 } from 'lucide-react'
 
 export default function SettingsPage() {
 	const router = useRouter()
@@ -73,8 +74,8 @@ export default function SettingsPage() {
 	if (loading) {
 		return (
 			<Container>
-				<div className='text-center py-12'>
-					<div className='inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary' />
+				<div className='flex items-center justify-center py-12'>
+					<Loader2 className='w-8 h-8 text-primary animate-spin' />
 				</div>
 			</Container>
 		)
@@ -82,8 +83,8 @@ export default function SettingsPage() {
 
 	return (
 		<Container>
-			<h1 className='text-2xl font-bold text-text-primary mb-1'>Настройки игры</h1>
-			<p className='text-text-secondary mb-6 text-sm'>Настройте параметры игры</p>
+			<h1 className='text-2xl md:text-3xl font-bold text-foreground mb-1'>Настройки игры</h1>
+			<p className='text-sm text-muted-foreground mb-6'>Настройте параметры игры</p>
 
 			<SettingsForm
 				settings={settings}
@@ -91,23 +92,35 @@ export default function SettingsPage() {
 				categories={categories}
 			/>
 
-			<div className='mt-8 flex gap-3'>
-				<Button
-					variant='ghost'
-					onClick={() => router.push('/game/new')}
-					className='flex-1'
-				>
-					Назад
-				</Button>
-				<Button
-					onClick={handleStartGame}
-					disabled={settings.categoryIds.length === 0 || creating}
-					className='flex-[2]'
-					size='lg'
-				>
-					{creating ? 'Создаём...' : '🎮 Начать игру'}
-				</Button>
-			</div>
+		<div className='mt-8 flex gap-3'>
+			<Button
+				variant='ghost'
+				onClick={() => router.push('/game/new')}
+				className='flex-1'
+				size='xl'
+			>
+				<ArrowLeft className='w-4 h-4' />
+				Назад
+			</Button>
+			<Button
+				onClick={handleStartGame}
+				disabled={settings.categoryIds.length === 0 || creating}
+				className='flex-[2]'
+				size='xl'
+			>
+				{creating ? (
+					<>
+						<Loader2 className='w-5 h-5 animate-spin' />
+						Создаём...
+					</>
+				) : (
+					<>
+						<Play className='w-5 h-5' />
+						Начать игру
+					</>
+				)}
+			</Button>
+		</div>
 		</Container>
 	)
 }

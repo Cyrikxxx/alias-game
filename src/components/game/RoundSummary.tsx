@@ -3,6 +3,7 @@ import { WordInRound } from '@/types'
 import Modal from '@/components/ui/Modal'
 import Button from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
+import { Check, X } from 'lucide-react'
 
 interface RoundSummaryProps {
 	isOpen: boolean
@@ -32,54 +33,60 @@ export default function RoundSummary({
 			title={`Итоги раунда — ${teamName}`}
 		>
 			{/* Список слов */}
-			<div className='space-y-3 max-h-[50vh] overflow-y-auto mb-4'>
+			<div className='space-y-2 max-h-[50vh] overflow-y-auto mb-4'>
 				{answered.map((word, i) => (
 					<button
 						key={word.wordId}
 						onClick={() => onToggleWord(i)}
 						className={cn(
-							'w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all',
-							word.guessed ? 'bg-success/20 border-2 border-success/50' : 'bg-danger/20 border-2 border-danger/50'
+							'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all border-2',
+							word.guessed 
+								? 'bg-primary/10 border-primary/50 hover:bg-primary/20' 
+								: 'bg-destructive/10 border-destructive/50 hover:bg-destructive/20'
 						)}
 					>
-						<span className='text-text-primary font-medium'>{word.text}</span>
-						<span className='text-2xl'>{word.guessed ? '✅' : '❌'}</span>
+						{word.guessed ? (
+							<Check className='w-5 h-5 text-primary shrink-0' />
+						) : (
+							<X className='w-5 h-5 text-destructive shrink-0' />
+						)}
+						<span className='text-foreground font-medium flex-1 text-left'>{word.text}</span>
 					</button>
 				))}
 			</div>
 
 			{/* Итого */}
-			<div className='bg-surface-light rounded-xl p-4 mb-4'>
-				<div className='flex justify-between text-sm text-text-secondary'>
+			<div className='bg-secondary rounded-lg p-4 mb-4'>
+				<div className='flex justify-between text-sm text-muted-foreground'>
 					<span>Угадано:</span>
-					<span className='text-success font-bold'>+{guessedCount}</span>
+					<span className='text-primary font-bold'>+{guessedCount}</span>
 				</div>
 				{skippedCount > 0 && (
-					<div className='flex justify-between text-sm text-text-secondary'>
+					<div className='flex justify-between text-sm text-muted-foreground'>
 						<span>Пропущено:</span>
-						<span className={penaltySkip ? 'text-danger font-bold' : 'text-text-secondary'}>
+						<span className={penaltySkip ? 'text-destructive font-bold' : 'text-muted-foreground'}>
 							{penaltySkip ? `−${skippedCount}` : `${skippedCount} (без штрафа)`}
 						</span>
 					</div>
 				)}
-				<div className='flex justify-between text-lg font-bold text-text-primary mt-2 pt-2 border-t border-surface'>
+				<div className='flex justify-between text-lg font-bold text-foreground mt-2 pt-2 border-t border-border'>
 					<span>Итого:</span>
-					<span className={score >= 0 ? 'text-success' : 'text-danger'}>
+					<span className={score >= 0 ? 'text-primary' : 'text-destructive'}>
 						{score > 0 ? '+' : ''}
 						{score}
 					</span>
 				</div>
 			</div>
 
-			<p className='text-text-secondary text-xs text-center mb-3'>Нажмите на слово, чтобы изменить его статус</p>
+		<p className='text-muted-foreground text-xs text-center mb-3'>Нажмите на слово, чтобы изменить его статус</p>
 
-			<Button
-				fullWidth
-				size='lg'
-				onClick={onConfirm}
-			>
-				Подтвердить
-			</Button>
+		<Button
+			fullWidth
+			size='xl'
+			onClick={onConfirm}
+		>
+			Подтвердить
+		</Button>
 		</Modal>
 	)
 }

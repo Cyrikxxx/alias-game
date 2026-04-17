@@ -1,22 +1,31 @@
 @import 'tailwindcss';
 
 @theme {
-	/* Кастомные цвета */
-	--color-primary: #6366f1;
-	--color-primary-hover: #4f46e5;
-	--color-success: #22c55e;
-	--color-success-hover: #16a34a;
-	--color-danger: #ef4444;
-	--color-danger-hover: #dc2626;
-	--color-background: #0f172a;
-	--color-surface: #1e293b;
-	--color-surface-light: #334155;
-	--color-text-primary: #f8fafc;
-	--color-text-secondary: #cbd5e1;
+	/* Цветовая палитра из дизайна */
+	--color-primary: hsl(160 84% 44%);
+	--color-primary-foreground: hsl(220 20% 7%);
+	--color-accent: hsl(36 95% 55%);
+	--color-accent-foreground: hsl(220 20% 7%);
+	--color-blue: hsl(220 84% 55%);
+	--color-blue-foreground: hsl(220 20% 7%);
+	--color-purple: hsl(280 70% 60%);
+	--color-purple-foreground: hsl(220 20% 7%);
+	--color-background: hsl(220 20% 7%);
+	--color-foreground: hsl(210 20% 95%);
+	--color-card: hsl(220 18% 10%);
+	--color-card-foreground: hsl(210 20% 95%);
+	--color-secondary: hsl(220 16% 16%);
+	--color-secondary-foreground: hsl(210 20% 95%);
+	--color-muted: hsl(220 14% 14%);
+	--color-muted-foreground: hsl(215 12% 55%);
+	--color-border: hsl(220 14% 18%);
+	--color-input: hsl(220 14% 18%);
+	--color-ring: hsl(160 84% 44%);
+	--color-destructive: hsl(0 72% 51%);
+	--color-destructive-foreground: hsl(210 20% 95%);
 
-	/* Кастомные анимации */
-	--animate-bounce-in: bounceIn 0.5s ease-out;
-	--animate-fade-in: fadeIn 0.3s ease-out;
+	/* Border radius */
+	--radius: 0.75rem;
 
 	/* Keyframes для анимаций */
 	@keyframes bounceIn {
@@ -46,12 +55,26 @@
 			transform: translateY(0);
 		}
 	}
+
+	@keyframes pulse-fast {
+		0%, 100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.5;
+		}
+	}
+
+	/* Анимации */
+	--animate-bounce-in: bounceIn 0.5s ease-out;
+	--animate-fade-in: fadeIn 0.3s ease-out;
+	--animate-pulse-fast: pulse-fast 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* Устанавливаем тёмный фон и светлый текст для всего сайта */
 body {
-	background-color: #0f172a;
-	color: #f8fafc;
+	background-color: var(--color-background);
+	color: var(--color-foreground);
 	min-height: 100vh;
 }
 
@@ -60,10 +83,10 @@ body {
 	width: 6px;
 }
 ::-webkit-scrollbar-track {
-	background: #1e293b;
+	background: var(--color-card);
 }
 ::-webkit-scrollbar-thumb {
-	background: #475569;
+	background: var(--color-border);
 	border-radius: 3px;
 }
 
@@ -75,4 +98,15 @@ input[type='number']::-webkit-outer-spin-button {
 }
 input[type='number'] {
 	-moz-appearance: textfield;
+}
+
+/* Дополнительные утилиты */
+.animate-pulse-fast {
+	animation: pulse-fast 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Отключаем прокрутку для body когда активна страница раунда */
+body:has(.round-page-container) {
+	overflow: hidden;
+	height: 100vh;
 }

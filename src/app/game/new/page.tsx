@@ -7,6 +7,7 @@ import { MIN_PLAYERS_PER_TEAM } from '@/constants'
 import Container from '@/components/layout/Container'
 import TeamForm from '@/components/game/TeamForm'
 import Button from '@/components/ui/Button'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 // Начальные данные — 2 команды по 2 пустых игрока
 const defaultTeams: TeamSetup[] = [
@@ -52,8 +53,8 @@ export default function NewGamePage() {
 
 	return (
 		<Container>
-			<h1 className='text-2xl font-bold text-text-primary mb-1'>Создание команд</h1>
-			<p className='text-text-secondary mb-6 text-sm'>Добавьте команды и игроков (минимум 2 команды по 2 игрока)</p>
+			<h1 className='text-2xl md:text-3xl font-bold text-foreground mb-1'>Создание команд</h1>
+			<p className='text-sm text-muted-foreground mb-6'>Добавьте команды и игроков (минимум 2 команды по 2 игрока)</p>
 
 			<TeamForm
 				teams={teams}
@@ -61,23 +62,26 @@ export default function NewGamePage() {
 				errors={errors}
 			/>
 
-			<div className='mt-8 flex gap-3'>
-				<Button
-					variant='ghost'
-					onClick={() => router.push('/')}
-					className='flex-1'
-				>
-					Назад
-				</Button>
-				<Button
-					onClick={handleContinue}
-					disabled={!isValid}
-					className='flex-[2]'
-					size='lg'
-				>
-					Продолжить →
-				</Button>
-			</div>
+		<div className='mt-8 flex gap-3'>
+			<Button
+				variant='ghost'
+				onClick={() => router.push('/')}
+				className='flex-1'
+				size='xl'
+			>
+				<ArrowLeft className='w-4 h-4' />
+				Назад
+			</Button>
+			<Button
+				onClick={handleContinue}
+				disabled={!isValid}
+				className='flex-[2]'
+				size='xl'
+			>
+				Продолжить
+				<ArrowRight className='w-4 h-4' />
+			</Button>
+		</div>
 		</Container>
 	)
 }

@@ -7,6 +7,7 @@ import { getSessionId } from '@/lib/session'
 import Container from '@/components/layout/Container'
 import Button from '@/components/ui/Button'
 import GameHistory from '@/components/game/GameHistory'
+import { Gamepad2, Plus, Loader2 } from 'lucide-react'
 
 export default function HomePage() {
 	const router = useRouter()
@@ -45,25 +46,35 @@ export default function HomePage() {
 
 	return (
 		<Container>
-			<div className='text-center mb-8'>
-				<h1 className='text-4xl md:text-5xl font-bold text-text-primary mb-2'>🎯 Alias Online</h1>
-				<p className='text-text-secondary'>Объясняй слова, угадывай, побеждай!</p>
+		<div className='flex flex-col items-center text-center mb-8 gap-4'>
+			<div className='bg-primary/10 rounded-2xl p-3'>
+				<Gamepad2 className='w-10 h-10 text-primary' />
 			</div>
+			<div>
+				<h1 className='text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2 tracking-tight text-balance'>
+					Alias Online
+				</h1>
+				<p className='text-base md:text-lg text-muted-foreground'>
+					Объясняй слова, угадывай, побеждай!
+				</p>
+			</div>
+		</div>
 
-			<Button
-				fullWidth
-				size='lg'
-				onClick={() => router.push('/game/new')}
-				className='mb-8'
-			>
-				🎮 Новая игра
-			</Button>
+		<Button
+			fullWidth
+			size='xl'
+			onClick={() => router.push('/game/new')}
+			className='mb-8'
+		>
+			<Plus className='w-5 h-5' />
+			Новая игра
+		</Button>
 
 			<div>
-				<h2 className='text-lg font-semibold text-text-primary mb-4'>📋 История игр</h2>
+				<h2 className='text-2xl md:text-3xl font-bold text-foreground mb-4'>История игр</h2>
 				{loading ? (
-					<div className='text-center py-8'>
-						<div className='inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary' />
+					<div className='flex items-center justify-center py-8'>
+						<Loader2 className='w-8 h-8 text-primary animate-spin' />
 					</div>
 				) : (
 					<GameHistory
